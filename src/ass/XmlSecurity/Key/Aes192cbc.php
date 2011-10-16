@@ -54,7 +54,7 @@ class Aes192Cbc extends \ass\XmlSecurity\Key\Mcrypt
     /**
      * Constructor.
      *
-     * @param string $key
+     * @param string $key Key string
      */
     public function __construct($key = null)
     {

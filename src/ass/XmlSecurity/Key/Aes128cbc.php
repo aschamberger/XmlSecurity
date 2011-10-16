@@ -54,7 +54,7 @@ class Aes128Cbc extends Mcrypt
     /**
      * Constructor.
      *
-     * @param string $key
+     * @param string $key Key string
      */
     public function __construct($key = null)
     {

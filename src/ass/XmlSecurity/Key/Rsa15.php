@@ -54,10 +54,10 @@ class Rsa15 extends Openssl
     /**
      * Loads the given cryptographic key for the class.
      *
-     * @param string $keyType
-     * @param string $key
-     * @param boolean $isFile
-     * @param string $passphrase
+     * @param string  $keyType    \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string  $key        Key string or filename
+     * @param boolean $isFile     Is parameter key a filename
+     * @param string  $passphrase Passphrase for given key
      */
     public function __construct($keyType, $key, $isFile = false, $passphrase = null)
     {

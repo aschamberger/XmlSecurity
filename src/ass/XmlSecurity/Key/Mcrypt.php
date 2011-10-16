@@ -76,8 +76,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     /**
      * Constructor.
      *
-     * @param string $encryptionType
-     * @param string $keyType
+     * @param string $key Key string
      */
     public function __construct($key = null)
     {
@@ -96,7 +95,8 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     /**
      * Decrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to decrypt
+     *
      * @return string
      */
     public function decryptData($data)
@@ -123,7 +123,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     /**
      * Encrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to encrypt
      * @return string
      */
     public function encryptData($data)
@@ -169,7 +169,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
      * Convert mcrypt error codes from function mcrypt_generic_init() into
      * error messages.
      *
-     * @param mixed $errorCode
+     * @param mixed $errorCode Error code returned from mcrypt_generic_init()
      * @return string
      */
     protected function getMcryptErrorString($errorCode)
@@ -208,8 +208,8 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
      *
      * http://us3.php.net/manual/en/function.mcrypt-encrypt.php#102428
      *
-     * @param string $string
-     * @param int $blocksize
+     * @param string $string    String where PKCS padding should be added
+     * @param int    $blocksize PKCS blocksize
      * @return string
      */
     protected function pkcsPad ($string, $blocksize)
@@ -224,7 +224,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
      * adapted from
      * http://us3.php.net/manual/en/function.mcrypt-encrypt.php#102428
      *
-     * @param string $string
+     * @param string $string String where PKCS padding should be removed
      * @return string
      */
     protected function pkcsUnpad($string)
@@ -236,7 +236,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     /**
      * Sign the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to sign
      * @return string
      */
     public function signData($data)
@@ -247,8 +247,8 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     /**
      * Verifies the given data with this key.
      *
-     * @param string $data
-     * @param string $signature
+     * @param string $data      Data which should be signed by signature
+     * @param string $signature Signature
      * @return boolean
      */
     public function verifySignature($data, $signature)

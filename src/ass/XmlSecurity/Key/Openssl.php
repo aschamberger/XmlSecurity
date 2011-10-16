@@ -96,10 +96,10 @@ abstract class Openssl extends \ass\XmlSecurity\Key
     /**
      * Loads the given cryptographic key for the class.
      *
-     * @param string $keyType
-     * @param string $key
-     * @param boolean $isFile
-     * @param string $passphrase
+     * @param string  $keyType    \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string  $key        Key string or filename
+     * @param boolean $isFile     Is parameter key a filename
+     * @param string  $passphrase Passphrase for given key
      */
     public function __construct($keyType, $key, $isFile = false, $passphrase = null)
     {
@@ -123,7 +123,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
     /**
      * Decrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to decrypt
      * @return string
      */
     public function decryptData($data)
@@ -143,21 +143,21 @@ abstract class Openssl extends \ass\XmlSecurity\Key
     /**
      * Encrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to encrypt
      * @return string
      */
     public function encryptData($data)
     {
         if ($this->keyType == self::TYPE_PUBLIC) {
-            if (false === openssl_public_encrypt($data, $encrypted_data, $this->opensslResource, $this->padding)) {
+            if (false === openssl_public_encrypt($data, $encryptedData, $this->opensslResource, $this->padding)) {
                 throw new EncryptionException($this->type, $this->getOpenSslErrorString());
             }
         } else {
-            if (false === openssl_private_encrypt($data, $encrypted_data, $this->opensslResource, $this->padding)) {
+            if (false === openssl_private_encrypt($data, $encryptedData, $this->opensslResource, $this->padding)) {
                 throw new EncryptionException($this->type, $this->getOpenSslErrorString());
             }
         }
-        return $encrypted_data;
+        return $encryptedData;
     }
 
     /**
@@ -165,7 +165,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      *
      * @return string
      */
-    private function getOpenSslErrorString()
+    protected function getOpenSslErrorString()
     {
         $errorStrings = array();
         while (false !== ($errorString = openssl_error_string())) {
@@ -180,7 +180,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      * Will return the X509 certificate in PEM-format if this key represents
      * an X509 certificate.
      *
-     * @param boolean $singleLineString
+     * @param boolean $singleLineString Certificate should be returned in one single line
      * @return string|null
      */
     public function getX509Certificate($singleLineString = false)
@@ -234,7 +234,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
     /**
      * Sign the given data with this key and return signature.
      *
-     * @param string $data
+     * @param string $data Data to sign
      * @return string
      */
     public function signData($data)
@@ -248,8 +248,8 @@ abstract class Openssl extends \ass\XmlSecurity\Key
     /**
      * Verifies the given data with this key.
      *
-     * @param string $data
-     * @param string $signature
+     * @param string $data      Data which should be signed by signature
+     * @param string $signature Signature string
      * @return boolean
      */
     public function verifySignature($data, $signature)
