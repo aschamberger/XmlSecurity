@@ -53,8 +53,8 @@ class InvalidArgumentException extends \InvalidArgumentException implements Exce
     /**
      * Constructor.
      *
-     * @param string $argument
-     * @param string $errorMessage
+     * @param string $argument     Argument name
+     * @param string $errorMessage Error message
      */
     public function __construct($argument, $errorMessage)
     {

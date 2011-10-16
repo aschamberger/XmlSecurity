@@ -53,8 +53,7 @@ class MissingMandatoryParametersException extends \RuntimeException implements E
     /**
      * Constructor.
      *
-     * @param string $type
-     * @param string $errorMessage
+     * @param string $errorMessage Error message
      */
     public function __construct($errorMessage)
     {

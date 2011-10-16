@@ -53,8 +53,8 @@ class DecryptionException extends \RuntimeException implements ExceptionInterfac
     /**
      * Constructor.
      *
-     * @param string $type
-     * @param string $errorMessage
+     * @param string $type         Algorithm type
+     * @param string $errorMessage Error message
      */
     public function __construct($type, $errorMessage)
     {
