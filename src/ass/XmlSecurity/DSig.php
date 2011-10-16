@@ -132,14 +132,16 @@ class DSig
     /**
      * Adds the given key resolver to the list of key resolvers.
      *
-     * @param string $ns
-     * @param string $localName
-     * @param callable $keyResolver
+     * @param string   $ns          Namespace of KeyInfo
+     * @param string   $localName   Name of identifying XML tag
+     * @param callable $keyResolver Callback that return XML security key
+     * @return null
      */
     public static function addKeyInfoResolver($ns, $localName, $keyResolver)
     {
         // don't know why there is a notice for self
         @self::$keyInfoResolvers[$ns][$localName] = $keyResolver;
+        return null;
     }
 
     /**
@@ -156,21 +158,21 @@ class DSig
      *         'namespaces' => array(
      *             'dsig' => 'http://...',
      *             'ns2'  => 'http://',
-     *        ),
-     *    ),
+     *         ),
+     *     ),
      *     'inclusive_namespaces' => array(
      *         'SOAP-ENV',
      *         'dsig'
      *         '#default'
-     *    ),
-     *);
+     *     ),
+     * );
      * </code>
      *
-     * @param \DOMElement $signature
-     * @param \DOMNode $node
-     * @param string $digestAlgorithm
-     * @param string $transformationAlgorithm
-     * @param array $options
+     * @param \DOMElement $signature               Siganture element
+     * @param \DOMNode    $node                    Node to add to signature
+     * @param string      $digestAlgorithm         Digest algorithm
+     * @param string      $transformationAlgorithm Trandformation algorithm
+     * @param array       $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces)
      * @return \DOMElement
      */
     public static function addNodeToSignature(\DOMElement $signature, \DOMNode $node, $digestAlgorithm, $transformationAlgorithm, array $options = array())
@@ -189,7 +191,7 @@ class DSig
         }
         $overwriteId = true;
         if (isset($options['overwrite_id'])) {
-            $overwriteId = (bool)$options['overwrite_id'];
+            $overwriteId = (bool) $options['overwrite_id'];
         }
 
         $uri = null;
@@ -220,7 +222,7 @@ class DSig
 
         if ($transformationAlgorithm == self::XPATH && isset($options['xpath_transformation'])) {
             $xpath = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG.':XPath', $options['xpath_transformation']['query']);
-            foreach($options['xpath_transformation']['namespaces'] as $prefix => $value) {
+            foreach ($options['xpath_transformation']['namespaces'] as $prefix => $value) {
                 $xpath->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:' . $prefix, $value);
             }
             $transform->appendChild($xpath);
@@ -247,8 +249,8 @@ class DSig
     /**
      * Calculates the digest of the given data with the desired algorithm.
      *
-     * @param string $data
-     * @param string $digestAlgorithm
+     * @param string $data            Data to calculate digest from
+     * @param string $digestAlgorithm Digest algorithm
      * @return string
      */
     private static function calculateDigest($data, $digestAlgorithm)
@@ -275,10 +277,10 @@ class DSig
     /**
      * Cananicalizes the given node with the desired algorithm.
      *
-     * @param \DOMNode $node
-     * @param string $canonicalizationAlgorithm
-     * @param array $xpath
-     * @param array $nsPrefixes
+     * @param \DOMNode $node                      DOMNode to canonicalize
+     * @param string   $canonicalizationAlgorithm Canonicalization algorithm
+     * @param array    $xpath                     XPATH
+     * @param array    $nsPrefixes                Namespace prefixes
      * @return string
      */
     private static function canonicalizeData(\DOMNode $node, $canonicalizationAlgorithm, $xpath = null, $nsPrefixes = null)
@@ -311,9 +313,10 @@ class DSig
     /**
      * Checks if mandatory parameters are given and throws Exception otherwise.
      *
-     * @param array(string) $mandatoryParameters
-     * @param string $keyAlgorithm
-     * @param array(string=>string) $parameters
+     * @param array(string)         $mandatoryParameters List of mandatory parameters
+     * @param string                $keyAlgorithm        Key algorithm
+     * @param array(string=>string) $parameters          Parameter array that should be checked
+     * @return null
      * @throws MissingMandatoryParametersException
      */
     protected static function checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, $keyAlgorithm, $parameters)
@@ -323,16 +326,17 @@ class DSig
                 throw new MissingMandatoryParametersException("Can't create key from {$keyAlgorithm} key values. Missing parameter '{$parameterName}'");
             }
         }
+        return null;
     }
 
     /**
      * Creates a new Signature node and appends it to the given node.
      *
-     * @param \ass\XmlSecurity\Key $keyForSignature
-     * @param string $canonicalizationAlgorithm
-     * @param \DOMNode $appendTo
-     * @param \DOMNode $insertBefore
-     * @param \DOMElement $keyInfo
+     * @param \ass\XmlSecurity\Key $keyForSignature           Key to sign
+     * @param string               $canonicalizationAlgorithm Canonicalization algorithm
+     * @param \DOMNode             $appendTo                  Append signature node to this node
+     * @param \DOMNode             $insertBefore              Insert signature node before the given node
+     * @param \DOMElement          $keyInfo                   KeyInfo element
      * @return \DOMElement
      */
     public static function createSignature(\ass\XmlSecurity\Key $keyForSignature, $canonicalizationAlgorithm, \DOMNode $appendTo, \DOMNode $insertBefore = null, \DOMElement $keyInfo = null)
@@ -399,7 +403,7 @@ class DSig
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $signature
+     * @param \DOMElement $signature Signature element
      * @return \ass\XmlSecurity\Key|null
      */
     public static function getSecurityKey(\DOMElement $signature)
@@ -424,8 +428,8 @@ class DSig
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $keyInfo
-     * @param string $algorithm
+     * @param \DOMElement $keyInfo   KeyInfo element
+     * @param string      $algorithm Key algorithm
      * @return \ass\XmlSecurity\Key|null
      */
     public static function getSecurityKeyFromKeyInfo(\DOMElement $keyInfo, $algorithm)
@@ -450,8 +454,8 @@ class DSig
     /**
      * Tries to resolve a key from the given \DOMElement.
      *
-     * @param \DOMElement $node
-     * @param string $algorithm
+     * @param \DOMElement $node      KeyInfo element
+     * @param string      $algorithm Key algorithm
      * @return \ass\XmlSecurity\Key|null
      * @throws MissingMandatoryParametersException
      */
@@ -499,15 +503,15 @@ class DSig
     /**
      * Tries to resolve a key from the given \DOMElement.
      *
-     * @param \DOMElement $node
-     * @param string $algorithm
+     * @param \DOMElement $node      KeyInfo element
+     * @param string      $algorithm Key algorithm
      * @return \ass\XmlSecurity\Key|null
      */
     private static function keyInfoX509DataResolver(\DOMElement $node, $algorithm)
     {
-        $X509Certificate = $node->getElementsByTagNameNS(self::NS_XMLDSIG, 'X509Certificate')->item(0);
-        if (!is_null($X509Certificate)) {
-            $certificate = \ass\XmlSecurity\Pem::formatKeyInPemFormat($X509Certificate->textContent);
+        $x509Certificate = $node->getElementsByTagNameNS(self::NS_XMLDSIG, 'X509Certificate')->item(0);
+        if (!is_null($x509Certificate)) {
+            $certificate = \ass\XmlSecurity\Pem::formatKeyInPemFormat($x509Certificate->textContent);
             return \ass\XmlSecurity\Key::factory($algorithm, $certificate, \ass\XmlSecurity\Key::TYPE_PUBLIC);
         }
         return null;
@@ -516,7 +520,7 @@ class DSig
     /**
      * Locates the 'ds:Signature' within the given \DOMDocument or \DOMNode.
      *
-     * @param \DOMNode $node
+     * @param \DOMNode $node Node within the signature should be located
      * @return \DOMElement
      */
     public static function locateSignature(\DOMNode $node)
@@ -541,9 +545,9 @@ class DSig
     /**
      * Process transformation.
      *
-     * @param \DOMNode $node
-     * @param string $transformationAlgorithm
-     * @param array(string=>mixed) $options
+     * @param \DOMNode             $node                    Not to transform
+     * @param string               $transformationAlgorithm Transformation algorithm
+     * @param array(string=>mixed) $options                 Options (xpath_transformation, inclusive_namespaces)
      * @return string
      */
     private static function processTransform(\DOMNode $node, $transformationAlgorithm, array $options = array())
@@ -577,9 +581,9 @@ class DSig
     /**
      * Sign the document.
      *
-     * @param \DOMElement $signature
-     * @param \ass\XmlSecurity\Key $keyForSignature
-     * @param string $canonicalizationAlgorithm
+     * @param \DOMElement          $signature                 Signature element to sign
+     * @param \ass\XmlSecurity\Key $keyForSignature           Key used to sign data
+     * @param string               $canonicalizationAlgorithm Canonicalization algorithm
      * @return \DOMElement
      */
     public static function signDocument(\DOMElement $signature, \ass\XmlSecurity\Key $keyForSignature, $canonicalizationAlgorithm)
@@ -591,7 +595,7 @@ class DSig
             $signatureValueString = base64_encode($keyForSignature->signData($canonicalizedData));
             $signatureValue = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG . ':SignatureValue', $signatureValueString);
             $keyInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'KeyInfo')->item(0);
-            $signature->insertBefore($signatureValue,$keyInfo);
+            $signature->insertBefore($signatureValue, $keyInfo);
         }
         return $signatureValue;
     }
@@ -599,8 +603,8 @@ class DSig
     /**
      * Verify the document's signature.
      *
-     * @param \DOMElement $signature
-     * @param \ass\XmlSecurity\Key $keyForSignature
+     * @param \DOMElement          $signature       Signature element to verify
+     * @param \ass\XmlSecurity\Key $keyForSignature Key to validate signature
      * @return boolean
      */
     public static function verifyDocumentSignature(\DOMElement $signature, \ass\XmlSecurity\Key $keyForSignature = null)
@@ -628,9 +632,8 @@ class DSig
     /**
      * Verify the document's signature.
      *
-     * @param \DOMElement $signature
-     * @param \ass\XmlSecurity\Key $keyForSignature
-     * @param array $options
+     * @param \DOMElement $signature Signature element
+     * @param array       $options   Options (xpath_transformation, inclusive_namespaces)
      * @return boolean
      */
     public static function verifyReferences(\DOMElement $signature, array $options = array())

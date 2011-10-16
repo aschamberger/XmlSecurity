@@ -109,8 +109,8 @@ class Pem
     /**
      * Encode a subset of data types into ASN.1 encoding format.
      *
-     * @param string $type
-     * @param string $data
+     * @param string $type ASN.1 type
+     * @param string $data Data to encode
      * @return string
      */
     private static function encodeAsnData($type, $data)
@@ -134,9 +134,9 @@ class Pem
     /**
      * Formats the given key string (base64 encoded) in desired PEM format.
      *
-     * @param string $key
+     * @param string $key  Key to format
      * @param string $type PEM_TYPE_* constant
-     * @return
+     * @return string
      */
     public static function formatKeyInPemFormat($key, $type=self::PEM_TYPE_CERTIFICATE_X509)
     {
@@ -150,8 +150,8 @@ class Pem
     /**
      * Transform a RSA Key in Modulus/Exponent format into PEM encoding.
      *
-     * @param string $modulus
-     * @param string $exponent
+     * @param string $modulus  Modulus
+     * @param string $exponent Exponent
      * @return string
      */
     public static function getPublicKeyFromModExp($modulus, $exponent)
@@ -161,13 +161,13 @@ class Pem
             self::encodeAsnData(self::ASN_TYPE_SEQUENCE,
                 self::OBJECT_IDENTIFIER_RSA .
                 "\0"
-           ) .
+            ) .
             self::encodeAsnData(self::ASN_TYPE_BITSTRING,
                 self::encodeAsnData(self::ASN_TYPE_SEQUENCE,
                     self::encodeAsnData(self::ASN_TYPE_INTEGER, $modulus) .
                     self::encodeAsnData(self::ASN_TYPE_INTEGER, $exponent)
-               )
-           )
+                )
+            )
         );
         $publicKeyBase64 = base64_encode($publicKey);
         return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
@@ -176,10 +176,10 @@ class Pem
     /**
      * Transform a DSA Key in P/Q/G/Y format into PEM encoding.
      *
-     * @param string $p
-     * @param string $q
-     * @param string $g
-     * @param string $y
+     * @param string $p P
+     * @param string $q Q
+     * @param string $g G
+     * @param string $y Y
      * @return string
      */
     public static function getPublicKeyFromPqgy($p, $q, $g, $y)
@@ -192,11 +192,11 @@ class Pem
                     self::encodeAsnData(self::ASN_TYPE_INTEGER, $p) .
                     self::encodeAsnData(self::ASN_TYPE_INTEGER, $q) .
                     self::encodeAsnData(self::ASN_TYPE_INTEGER, $g)
-               )
-           ) .
+                )
+            ) .
             self::encodeAsnData(self::ASN_TYPE_BITSTRING,
                 self::encodeAsnData(self::ASN_TYPE_INTEGER, $y)
-           )
+            )
         );
         $publicKeyBase64 = base64_encode($publicKey);
         return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
@@ -209,7 +209,7 @@ class Pem
      * If no boundary is found it is assumed there is a single key given.
      * The key is returned in a single line without breaks.
      *
-     * @param string $pem
+     * @param string $pem  PEM to parse
      * @param string $type PEM_TYPE_* constant
      * @return string|array(string)
      */

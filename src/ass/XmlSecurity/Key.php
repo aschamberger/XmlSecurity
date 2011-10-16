@@ -134,7 +134,7 @@ abstract class Key
     /**
      * Decrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to decrypt
      * @return string
      */
     abstract public function decryptData($data);
@@ -142,7 +142,7 @@ abstract class Key
     /**
      * Encrypt the given data with this key.
      *
-     * @param string $data
+     * @param string $data Data to encrypt
      * @return string
      */
     abstract public function encryptData($data);
@@ -150,13 +150,13 @@ abstract class Key
     /**
      * Factory method.
      *
-     * @param string $encryptionType
-     * @param string $key
-     * @param string $keyType private|public
-     * @param string $password
+     * @param string $encryptionType Encryption algorithm
+     * @param string $key            Key string
+     * @param string $keyType        \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string $passphrase     Passphrase for key
      * @return \ass\XmlSecurity\Key
      */
-    public static function factory($encryptionType, $key = null, $keyType = null, $password = null)
+    public static function factory($encryptionType, $key = null, $keyType = null, $passphrase = null)
     {
         switch ($encryptionType) {
             case self::TRIPLEDES_CBC:
@@ -172,16 +172,16 @@ abstract class Key
                 return new \ass\XmlSecurity\Key\Aes256Cbc($key);
                 break;
             case self::RSA_1_5:
-                return new \ass\XmlSecurity\Key\Rsa15($keyType, $key, false, $password);
+                return new \ass\XmlSecurity\Key\Rsa15($keyType, $key, false, $passphrase);
                 break;
             case self::RSA_OAEP_MGF1P:
-                return new \ass\XmlSecurity\Key\RsaOaepMgf1p($keyType, $key, false, $password);
+                return new \ass\XmlSecurity\Key\RsaOaepMgf1p($keyType, $key, false, $passphrase);
                 break;
             case self::RSA_SHA1:
-                return new \ass\XmlSecurity\Key\RsaSha1($keyType, $key, false, $password);
+                return new \ass\XmlSecurity\Key\RsaSha1($keyType, $key, false, $passphrase);
                 break;
             case self::RSA_SHA256:
-                return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, false, $password);
+                return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, false, $passphrase);
                 break;
             default:
                 throw new InvalidArgumentException('encryptionType', 'Invalid encryption type given');
@@ -212,7 +212,7 @@ abstract class Key
     /**
      * Sign the given data with this key and return signature.
      *
-     * @param string $data
+     * @param string $data Data to sign
      * @return string
      */
     abstract public function signData($data);
@@ -220,8 +220,8 @@ abstract class Key
     /**
      * Verifies the given data with this key.
      *
-     * @param string $data
-     * @param string $signature
+     * @param string $data      Data which should be signed by signature
+     * @param string $signature Signature string
      * @return boolean
      */
     abstract public function verifySignature($data, $signature);

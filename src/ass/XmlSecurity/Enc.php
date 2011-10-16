@@ -45,14 +45,13 @@ namespace ass\XmlSecurity;
 
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 
-
 /**
  * This class provides methods to encrypt XML documents and implements the
  * 'XML Encryption Syntax and Processing' standard.
  *
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
- * @see     http://www.w3.org/TR/xmlenc-core/
+ * @see    http://www.w3.org/TR/xmlenc-core/
  */
 class Enc
 {
@@ -77,14 +76,14 @@ class Enc
     const PFX_XMLENC = 'xenc';
 
     /**
-     * Encryption type 'content'.
+     * Encryption type 'CONTENT'.
      */
-    const Content = 'http://www.w3.org/2001/04/xmlenc#Content';
+    const CONTENT = 'http://www.w3.org/2001/04/xmlenc#Content';
 
     /**
-     * Encryption type 'element'.
+     * Encryption type 'ELEMENT'.
      */
-    const Element = 'http://www.w3.org/2001/04/xmlenc#Element';
+    const ELEMENT = 'http://www.w3.org/2001/04/xmlenc#Element';
 
     /**
      * ds:RetrievalMethod type for encrypted keys.
@@ -94,12 +93,12 @@ class Enc
     /**
      * Creates a new EncryptedKey node and appends it to the given node.
      *
-     * @param string $guid
-     * @param \ass\XmlSecurity\Key $keyToBeEncrypted
-     * @param \ass\XmlSecurity\Key $keyForEncryption
-     * @param \DOMNode $appendTo
-     * @param \DOMNode $insertBefore
-     * @param \DOMElement $keyInfo
+     * @param string               $guid             Unique id
+     * @param \ass\XmlSecurity\Key $keyToBeEncrypted Key that should be encrypted
+     * @param \ass\XmlSecurity\Key $keyForEncryption Key to use for encryption
+     * @param \DOMNode             $appendTo         Node where encrypted key should be appenden
+     * @param \DOMNode             $insertBefore     Encrypted key should be inserted before this node
+     * @param \DOMElement          $keyInfo          KeyInfo element
      * @return \DOMElement
      */
     public static function createEncryptedKey($guid, \ass\XmlSecurity\Key $keyToBeEncrypted, \ass\XmlSecurity\Key $keyForEncryption, \DOMNode $appendTo, \DOMNode $insertBefore = null, \DOMElement $keyInfo = null)
@@ -136,7 +135,7 @@ class Enc
     /**
      * Creates a new ReferenceList Node and appends it to the given node.
      *
-     * @param \DOMElement $appendTo
+     * @param \DOMElement $appendTo Appent the reference list to this node
      * @return \DOMElement
      */
     public static function createReferenceList(\DOMElement $appendTo)
@@ -152,8 +151,8 @@ class Enc
      *
      * Uses either the given key or resolves the KeyInfo data.
      *
-     * @param \DOMElement $encryptedKey
-     * @param \ass\XmlSecurity\Key $keyToDecrypt
+     * @param \DOMElement          $encryptedKey Encrypted key element
+     * @param \ass\XmlSecurity\Key $keyToDecrypt Key used for decryption
      * @return string|null
      */
     public static function decryptEncryptedKey(\DOMElement $encryptedKey, \ass\XmlSecurity\Key $keyToDecrypt = null)
@@ -162,12 +161,10 @@ class Enc
             $keyToDecrypt = self::getSecurityKey($encryptedKey);
         }
         $encryptionMethod = $encryptedKey->getElementsByTagNameNS(self::NS_XMLENC, 'EncryptionMethod')->item(0);
-        if (!is_null($encryptionMethod))
-        {
+        if (!is_null($encryptionMethod)) {
             $algorithm = $encryptionMethod->getAttribute('Algorithm');
             $cipherValue = $encryptedKey->getElementsByTagNameNS(self::NS_XMLENC, 'CipherValue')->item(0);
-            if (!is_null($cipherValue))
-            {
+            if (!is_null($cipherValue)) {
                 return $keyToDecrypt->decryptData(base64_decode($cipherValue->nodeValue));
             }
         }
@@ -179,9 +176,9 @@ class Enc
      *
      * Uses either the given key or resolves the KeyInfo data.
      *
-     * @param \DOMNode $node
-     * @param \ass\XmlSecurity\Key $key
-     * @return \DOMNode
+     * @param \DOMNode             $node Node to decrypt
+     * @param \ass\XmlSecurity\Key $key  Key to use for decryption
+     * @return \DOMNode|null
      */
     public static function decryptNode(\DOMNode $node, $key = null)
     {
@@ -196,7 +193,6 @@ class Enc
             if (is_null($key)) {
                 $key = self::getSecurityKey($encryptedData);
             }
-
             $type = $encryptedData->getAttribute('Type');
             $cipherValue = $encryptedData->getElementsByTagNameNS(self::NS_XMLENC, 'CipherValue')->item(0);
             $encryptionMethod = $encryptedData->getElementsByTagNameNS(self::NS_XMLENC, 'EncryptionMethod')->item(0);
@@ -205,7 +201,7 @@ class Enc
                 $decryptedDataString = $key->decryptData(base64_decode($cipherValue->nodeValue));
                 // replace nodes
                 switch ($type) {
-                    case self::Element:
+                    case self::ELEMENT:
                         if ($node instanceof \DOMDocument) {
                             $node = new \DOMDocument();
                             $node->loadXML($decryptedDataString);
@@ -216,7 +212,7 @@ class Enc
                             $node = $documentFragment;
                         }
                         break;
-                    case self::Content:
+                    case self::CONTENT:
                         $documentFragment = $doc->createDocumentFragment();
                         $documentFragment->appendXML($decryptedDataString);
                         if ($node instanceof \DOMDocument) {
@@ -228,8 +224,7 @@ class Enc
                         break;
                 }
             } else {
-                // TODO
-                throw new \RuntimeException("Cannot locate encrypted data");
+                return null;
             }
         }
         return $node;
@@ -238,17 +233,17 @@ class Enc
     /**
      * Encryptes the given node and adds it to the list of references.
      *
-     * @param \DOMNode $node
-     * @param string $type
-     * @param \ass\XmlSecurity\Key $key
-     * @param \DOMElement $referenceList
-     * @param \DOMElement $keyInfo
+     * @param \DOMNode             $node          DOM node to encrypt
+     * @param string               $type          \ass\XmlSecurity\Enc::ELEMENT || \ass\XmlSecurity\Enc::CONTENT
+     * @param \ass\XmlSecurity\Key $key           Security key to use for encryption
+     * @param \DOMElement          $referenceList Reference list element
+     * @param \DOMElement          $keyInfo       KeyInfo element
      * @return \DOMNode
      */
     public static function encryptNode(\DOMNode $node, $type, \ass\XmlSecurity\Key $key, \DOMElement $referenceList = null, $keyInfo = null)
     {
-        if ($type != self::Element && $type != self::Content) {
-            throw InvalidArgumentException('type', 'Value must be either \ass\XmlSecurity\Enc::Content or \ass\XmlSecurity\Enc::Element');
+        if ($type != self::ELEMENT && $type != self::CONTENT) {
+            throw InvalidArgumentException('type', 'Value must be either \ass\XmlSecurity\Enc::CONTENT or \ass\XmlSecurity\Enc::ELEMENT');
         }
         if ($node instanceof \DOMDocument) {
             $doc = $node;
@@ -266,16 +261,15 @@ class Enc
 
         $dataToEncrypt = '';
         switch ($type) {
-            case self::Element:
+            case self::ELEMENT:
                 $dataToEncrypt = $doc->saveXML($node);
-                $encryptedData->setAttribute('Type', self::Element);
+                $encryptedData->setAttribute('Type', self::ELEMENT);
                 break;
-            case self::Content:
-                foreach ($node->childNodes as $child)
-                {
+            case self::CONTENT:
+                foreach ($node->childNodes as $child) {
                     $dataToEncrypt .= $doc->saveXML($child);
                 }
-                $encryptedData->setAttribute('Type', self::Content);
+                $encryptedData->setAttribute('Type', self::CONTENT);
                 break;
         }
 
@@ -293,15 +287,15 @@ class Enc
 
         // replace nodes
         switch ($type) {
-            case self::Element:
+            case self::ELEMENT:
                 if ($node instanceof \DOMDocument) {
                     $node->replaceChild($encryptedData, $node->documentElement);
                 } else {
                     $node->parentNode->replaceChild($encryptedData, $node);
                 }
                 break;
-            case self::Content:
-                while($node->firstChild) {
+            case self::CONTENT:
+                while ($node->firstChild) {
                     $node->removeChild($node->firstChild);
                 }
                 $node->appendChild($encryptedData);
@@ -326,7 +320,7 @@ class Enc
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $encryptedData
+     * @param \DOMElement $encryptedData Encrypted data element
      * @return \ass\XmlSecurity\Key|null
      */
     public static function getSecurityKey(\DOMElement $encryptedData)
@@ -345,8 +339,8 @@ class Enc
     /**
      * Locates EncryptedData elements within the given node or referenceList.
      *
-     * @param \DOMNode $node
-     * @param \DOMElement $referenceList
+     * @param \DOMNode    $node          Node where encrypted data should be located
+     * @param \DOMElement $referenceList Reference list element
      * @return \DOMNodeList
      */
     public static function locateEncryptedData(\DOMNode $node, \DOMElement $referenceList = null)
@@ -381,7 +375,7 @@ class Enc
     /**
      * Locates the 'xenc:EncryptedKey' within the given \DOMDocument or \DOMNode.
      *
-     * @param \DOMNode $node
+     * @param \DOMNode $node Node where encrypted key should be located
      * @return \DOMElement
      */
     public static function locateEncryptedKey(\DOMNode $node)
@@ -406,7 +400,7 @@ class Enc
     /**
      * Locates the 'xenc:ReferenceList' within the given \DOMDocument or \DOMNode.
      *
-     * @param \DOMNode $node
+     * @param \DOMNode $node Node where reference list should be located
      * @return \DOMElement
      */
     public static function locateReferenceList(\DOMNode $node)
