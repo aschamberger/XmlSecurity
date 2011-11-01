@@ -150,13 +150,14 @@ abstract class Key
     /**
      * Factory method.
      *
-     * @param string $encryptionType Encryption algorithm
-     * @param string $key            Key string
-     * @param string $keyType        \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
-     * @param string $passphrase     Passphrase for key
+     * @param string  $encryptionType Encryption algorithm
+     * @param string  $key            Key string
+     * @param boolean $keyIsFile      Key parameter is file name
+     * @param string  $keyType        \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string  $passphrase     Passphrase for key
      * @return \ass\XmlSecurity\Key
      */
-    public static function factory($encryptionType, $key = null, $keyType = null, $passphrase = null)
+    public static function factory($encryptionType, $key = null, $keyIsFile = true, $keyType = null, $passphrase = null)
     {
         switch ($encryptionType) {
             case self::TRIPLEDES_CBC:
@@ -172,16 +173,16 @@ abstract class Key
                 return new \ass\XmlSecurity\Key\Aes256Cbc($key);
                 break;
             case self::RSA_1_5:
-                return new \ass\XmlSecurity\Key\Rsa15($keyType, $key, false, $passphrase);
+                return new \ass\XmlSecurity\Key\Rsa15($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_OAEP_MGF1P:
-                return new \ass\XmlSecurity\Key\RsaOaepMgf1p($keyType, $key, false, $passphrase);
+                return new \ass\XmlSecurity\Key\RsaOaepMgf1p($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_SHA1:
-                return new \ass\XmlSecurity\Key\RsaSha1($keyType, $key, false, $passphrase);
+                return new \ass\XmlSecurity\Key\RsaSha1($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_SHA256:
-                return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, false, $passphrase);
+                return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, $keyIsFile, $passphrase);
                 break;
             default:
                 throw new InvalidArgumentException('encryptionType', 'Invalid encryption type given');
