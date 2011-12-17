@@ -124,6 +124,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      * Decrypt the given data with this key.
      *
      * @param string $data Data to decrypt
+     *
      * @return string
      */
     public function decryptData($data)
@@ -144,6 +145,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      * Encrypt the given data with this key.
      *
      * @param string $data Data to encrypt
+     *
      * @return string
      */
     public function encryptData($data)
@@ -181,6 +183,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      * an X509 certificate.
      *
      * @param boolean $singleLineString Certificate should be returned in one single line
+     *
      * @return string|null
      */
     public function getX509Certificate($singleLineString = false)
@@ -235,6 +238,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      * Sign the given data with this key and return signature.
      *
      * @param string $data Data to sign
+     *
      * @return string
      */
     public function signData($data)
@@ -250,6 +254,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
      *
      * @param string $data      Data which should be signed by signature
      * @param string $signature Signature string
+     *
      * @return boolean
      */
     public function verifySignature($data, $signature)

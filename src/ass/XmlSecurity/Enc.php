@@ -99,6 +99,7 @@ class Enc
      * @param \DOMNode             $appendTo         Node where encrypted key should be appenden
      * @param \DOMNode             $insertBefore     Encrypted key should be inserted before this node
      * @param \DOMElement          $keyInfo          KeyInfo element
+     *
      * @return \DOMElement
      */
     public static function createEncryptedKey($guid, \ass\XmlSecurity\Key $keyToBeEncrypted, \ass\XmlSecurity\Key $keyForEncryption, \DOMNode $appendTo, \DOMNode $insertBefore = null, \DOMElement $keyInfo = null)
@@ -136,6 +137,7 @@ class Enc
      * Creates a new ReferenceList Node and appends it to the given node.
      *
      * @param \DOMElement $appendTo Appent the reference list to this node
+     *
      * @return \DOMElement
      */
     public static function createReferenceList(\DOMElement $appendTo)
@@ -153,6 +155,7 @@ class Enc
      *
      * @param \DOMElement          $encryptedKey Encrypted key element
      * @param \ass\XmlSecurity\Key $keyToDecrypt Key used for decryption
+     *
      * @return string|null
      */
     public static function decryptEncryptedKey(\DOMElement $encryptedKey, \ass\XmlSecurity\Key $keyToDecrypt = null)
@@ -178,6 +181,7 @@ class Enc
      *
      * @param \DOMNode             $node Node to decrypt
      * @param \ass\XmlSecurity\Key $key  Key to use for decryption
+     *
      * @return \DOMNode|null
      */
     public static function decryptNode(\DOMNode $node, $key = null)
@@ -238,6 +242,7 @@ class Enc
      * @param \ass\XmlSecurity\Key $key           Security key to use for encryption
      * @param \DOMElement          $referenceList Reference list element
      * @param \DOMElement          $keyInfo       KeyInfo element
+     *
      * @return \DOMNode
      */
     public static function encryptNode(\DOMNode $node, $type, \ass\XmlSecurity\Key $key, \DOMElement $referenceList = null, $keyInfo = null)
@@ -321,6 +326,7 @@ class Enc
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
      * @param \DOMElement $encryptedData Encrypted data element
+     *
      * @return \ass\XmlSecurity\Key|null
      */
     public static function getSecurityKey(\DOMElement $encryptedData)
@@ -341,6 +347,7 @@ class Enc
      *
      * @param \DOMNode    $node          Node where encrypted data should be located
      * @param \DOMElement $referenceList Reference list element
+     *
      * @return \DOMNodeList
      */
     public static function locateEncryptedData(\DOMNode $node, \DOMElement $referenceList = null)
@@ -376,6 +383,7 @@ class Enc
      * Locates the 'xenc:EncryptedKey' within the given \DOMDocument or \DOMNode.
      *
      * @param \DOMNode $node Node where encrypted key should be located
+     *
      * @return \DOMElement
      */
     public static function locateEncryptedKey(\DOMNode $node)
@@ -401,6 +409,7 @@ class Enc
      * Locates the 'xenc:ReferenceList' within the given \DOMDocument or \DOMNode.
      *
      * @param \DOMNode $node Node where reference list should be located
+     *
      * @return \DOMElement
      */
     public static function locateReferenceList(\DOMNode $node)

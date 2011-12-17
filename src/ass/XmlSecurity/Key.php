@@ -135,6 +135,7 @@ abstract class Key
      * Decrypt the given data with this key.
      *
      * @param string $data Data to decrypt
+     *
      * @return string
      */
     abstract public function decryptData($data);
@@ -143,6 +144,7 @@ abstract class Key
      * Encrypt the given data with this key.
      *
      * @param string $data Data to encrypt
+     *
      * @return string
      */
     abstract public function encryptData($data);
@@ -155,6 +157,7 @@ abstract class Key
      * @param boolean $keyIsFile      Key parameter is file name
      * @param string  $keyType        \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
      * @param string  $passphrase     Passphrase for key
+     *
      * @return \ass\XmlSecurity\Key
      */
     public static function factory($encryptionType, $key = null, $keyIsFile = true, $keyType = null, $passphrase = null)
@@ -214,6 +217,7 @@ abstract class Key
      * Sign the given data with this key and return signature.
      *
      * @param string $data Data to sign
+     *
      * @return string
      */
     abstract public function signData($data);
@@ -223,6 +227,7 @@ abstract class Key
      *
      * @param string $data      Data which should be signed by signature
      * @param string $signature Signature string
+     *
      * @return boolean
      */
     abstract public function verifySignature($data, $signature);

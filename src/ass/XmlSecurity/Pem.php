@@ -111,6 +111,7 @@ class Pem
      *
      * @param string $type ASN.1 type
      * @param string $data Data to encode
+     *
      * @return string
      */
     private static function encodeAsnData($type, $data)
@@ -136,6 +137,7 @@ class Pem
      *
      * @param string $key  Key to format
      * @param string $type PEM_TYPE_* constant
+     *
      * @return string
      */
     public static function formatKeyInPemFormat($key, $type=self::PEM_TYPE_CERTIFICATE_X509)
@@ -152,6 +154,7 @@ class Pem
      *
      * @param string $modulus  Modulus
      * @param string $exponent Exponent
+     *
      * @return string
      */
     public static function getPublicKeyFromModExp($modulus, $exponent)
@@ -180,6 +183,7 @@ class Pem
      * @param string $q Q
      * @param string $g G
      * @param string $y Y
+     *
      * @return string
      */
     public static function getPublicKeyFromPqgy($p, $q, $g, $y)
@@ -211,6 +215,7 @@ class Pem
      *
      * @param string $pem  PEM to parse
      * @param string $type PEM_TYPE_* constant
+     *
      * @return string|array(string)
      */
     public static function parseKeyFromPemFormat($pem, $type=self::PEM_TYPE_CERTIFICATE_X509)
