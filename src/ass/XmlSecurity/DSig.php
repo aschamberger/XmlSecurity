@@ -228,8 +228,7 @@ class DSig
                 $xpath->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:' . $prefix, $value);
             }
             $transform->appendChild($xpath);
-        }
-        elseif (($transformationAlgorithm == self::EXC_C14N || $transformationAlgorithm == self::EXC_C14N_COMMENTS)
+        } elseif (($transformationAlgorithm == self::EXC_C14N || $transformationAlgorithm == self::EXC_C14N_COMMENTS)
             && isset($options['inclusive_namespaces'])) {
             $inclusiveNamespaces  = $doc->createElementNS(self::EXC_C14N, 'es:InclusiveNamespaces');
             $inclusiveNamespaces->setAttributeNS(self::EXC_C14N, 'PrefixList', implode(' ', $options['inclusive_namespaces']));
