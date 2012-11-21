@@ -137,6 +137,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
                 throw new DecryptionException($this->type, $this->getOpenSslErrorString());
             }
         }
+
         return $decrypted;
     }
 
@@ -158,6 +159,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
                 throw new EncryptionException($this->type, $this->getOpenSslErrorString());
             }
         }
+
         return $encryptedData;
     }
 
@@ -172,6 +174,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         while (false !== ($errorString = openssl_error_string())) {
             $errorStrings[] = $errorString;
         }
+
         return implode("<br />\n", $errorStrings);
     }
 
@@ -192,8 +195,10 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         }
         if ($singleLineString === true) {
             $certs = \ass\XmlSecurity\Pem::parseKeyFromPemFormat($this->key, \ass\XmlSecurity\Pem::PEM_TYPE_CERTIFICATE_X509);
+
             return (isset($certs[0])) ? $certs[0] : null;
         }
+
         return $this->key;
     }
 
@@ -216,6 +221,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         foreach ($keyid as $hexchar) {
             $data .= chr(hexdec($hexchar));
         }
+
         return base64_encode($data);
     }
 
@@ -230,6 +236,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
             return null;
         }
         $certs = \ass\XmlSecurity\Pem::parseKeyFromPemFormat($this->key, \ass\XmlSecurity\Pem::PEM_TYPE_CERTIFICATE_X509);
+
         return strtolower(sha1(base64_decode($certs[0])));
     }
 
@@ -245,6 +252,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         if (false === openssl_sign($data, $signature, $this->opensslResource, $this->digest)) {
             throw new SignatureErrorException($this->type, $this->getOpenSslErrorString());
         }
+
         return $signature;
     }
 
@@ -264,6 +272,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         } elseif (0 === $resultStatus) {
             throw new InvalidSignatureException($this->type, $this->getOpenSslErrorString());
         }
+
         return true;
     }
 }

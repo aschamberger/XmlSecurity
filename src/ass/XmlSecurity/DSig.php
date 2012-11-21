@@ -142,6 +142,7 @@ class DSig
     {
         // don't know why there is a notice for self
         @self::$keyInfoResolvers[$ns][$localName] = $keyResolver;
+
         return null;
     }
 
@@ -273,6 +274,7 @@ class DSig
             default:
                 throw new InvalidArgumentException('digestAlgorithm', "Invalid digest algorithm given: {$digestAlgorithm}");
         }
+
         return base64_encode(hash($algorithm, $data, true));
     }
 
@@ -310,6 +312,7 @@ class DSig
             default:
                 throw new InvalidArgumentException('canonicalizationAlgorithm', "Invalid canonicalization algorithm given: {$canonicalizationAlgorithm}");
         }
+
         return $node->C14N($exclusive, $withComments, $xpath, $nsPrefixes);
     }
 
@@ -330,6 +333,7 @@ class DSig
                 throw new MissingMandatoryParametersException("Can't create key from {$keyAlgorithm} key values. Missing parameter '{$parameterName}'");
             }
         }
+
         return null;
     }
 
@@ -423,6 +427,7 @@ class DSig
                 return self::getSecurityKeyFromKeyInfo($keyInfo, $algorithm);
             }
         }
+
         return null;
     }
 
@@ -456,6 +461,7 @@ class DSig
                 }
             }
         }
+
         return null;
     }
 
@@ -488,6 +494,7 @@ class DSig
                         self::checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, 'DSA', $parameters);
                         // calculate public key
                         $publicKey = \ass\XmlSecurity\Pem::getPublicKeyFromPqgy($parameters['P'], $parameters['Q'], $parameters['G'], $parameters['Y']);
+
                         return \ass\XmlSecurity\Key::factory($algorithm, $publicKey, \ass\XmlSecurity\Key::TYPE_PUBLIC);
                     case 'RSAKeyValue':
                         $parameters = array();
@@ -502,10 +509,12 @@ class DSig
                         self::checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, 'DSA', $parameters);
                         // calculate public key
                         $publicKey = \ass\XmlSecurity\Pem::getPublicKeyFromModExp($parameters['Modulus'], $parameters['Exponent']);
+
                         return \ass\XmlSecurity\Key::factory($algorithm, $publicKey, \ass\XmlSecurity\Key::TYPE_PUBLIC);
                 }
             }
         }
+
         return null;
     }
 
@@ -522,8 +531,10 @@ class DSig
         $x509Certificate = $node->getElementsByTagNameNS(self::NS_XMLDSIG, 'X509Certificate')->item(0);
         if (!is_null($x509Certificate)) {
             $certificate = \ass\XmlSecurity\Pem::formatKeyInPemFormat($x509Certificate->textContent);
+
             return \ass\XmlSecurity\Key::factory($algorithm, $certificate, \ass\XmlSecurity\Key::TYPE_PUBLIC);
         }
+
         return null;
     }
 
@@ -550,6 +561,7 @@ class DSig
         if ($nodes->length > 0) {
             return $nodes->item(0);
         }
+
         return null;
     }
 
@@ -574,6 +586,7 @@ class DSig
                         'namespaces' => $options['xpath_transformation']['namespaces'],
                    );
                 }
+
                 return self::canonicalizeData($node, self::C14N, $xpath);
             case self::C14N:
             case self::C14N_COMMENTS:
@@ -584,6 +597,7 @@ class DSig
                 if (isset($options['inclusive_namespaces'])) {
                     $nsPrefixes = $options['inclusive_namespaces'];
                 }
+
                 return self::canonicalizeData($node, $transformationAlgorithm, null, $nsPrefixes);
             default:
                 throw new \InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
@@ -610,6 +624,7 @@ class DSig
             $keyInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'KeyInfo')->item(0);
             $signature->insertBefore($signatureValue, $keyInfo);
         }
+
         return $signatureValue;
     }
 
@@ -636,10 +651,12 @@ class DSig
                 if (!is_null($signatureValue)) {
                     $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm);
                     $decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
+
                     return $keyForSignature->verifySignature($canonicalizedData, $decodedSignatureValueFromSoapMessage);
                 }
             }
         }
+
         return false;
     }
 
@@ -730,8 +747,10 @@ class DSig
                 }
                 $allValid = ($allValid === false) ? false : $isValid;
             }
+
             return $allValid;
         }
+
         return false;
     }
 }

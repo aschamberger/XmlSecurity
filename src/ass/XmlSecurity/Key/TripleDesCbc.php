@@ -86,6 +86,7 @@ class TripleDesCbc extends Mcrypt
             $byte |= $parity;
             $key[$i] = chr($byte);
         }
+
         return $key;
     }
 }

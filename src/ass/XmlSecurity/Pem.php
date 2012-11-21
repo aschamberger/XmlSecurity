@@ -129,6 +129,7 @@ class Pem
         } else {
             $output = null;
         }
+
         return $output;
     }
 
@@ -146,6 +147,7 @@ class Pem
         $pem = "-----BEGIN " . $type . "-----\n";
         $pem .= chunk_split($key, 64, "\n");
         $pem .= "-----END " . $type . "-----\n";
+
         return $pem;
     }
 
@@ -173,6 +175,7 @@ class Pem
             )
         );
         $publicKeyBase64 = base64_encode($publicKey);
+
         return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
     }
 
@@ -203,6 +206,7 @@ class Pem
             )
         );
         $publicKeyBase64 = base64_encode($publicKey);
+
         return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
     }
 
