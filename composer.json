@@ -19,5 +19,9 @@
     },
     "autoload": {
        "psr-0": { "ass\\XmlSecurity": "src/" }
+    },
+    "support": {
+        "issues": "https://github.com/aschamberger/XmlSecurity/issues",
+        "source": "https://github.com/aschamberger/XmlSecurity"
     }
 }
