@@ -46,7 +46,6 @@ namespace ass\XmlSecurity\Key;
 use ass\XmlSecurity\Exception\DecryptionException;
 use ass\XmlSecurity\Exception\EncryptionException;
 use ass\XmlSecurity\Exception\InvalidSignatureException;
-use ass\XmlSecurity\Exception\MissingMandatoryParametersException;
 use ass\XmlSecurity\Exception\SignatureErrorException;
 
 /**
