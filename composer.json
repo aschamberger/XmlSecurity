@@ -4,6 +4,7 @@
     "description": "The XmlSecurity library is written in PHP for working with XML Encryption and Signatures",
     "keywords": [ "xml", "security", "encryption", "signature" ],
     "homepage": "https://github.com/aschamberger/XmlSecurity",
+    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Robert Richards",
