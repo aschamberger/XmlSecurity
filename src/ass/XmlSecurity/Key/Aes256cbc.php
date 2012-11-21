@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class Aes256Cbc extends Mcrypt
+class Aes256cbc extends Mcrypt
 {
     /**
      * Constructor.
