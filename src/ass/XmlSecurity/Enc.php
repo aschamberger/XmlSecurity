@@ -145,6 +145,7 @@ class Enc
         $doc = $appendTo->ownerDocument;
         $referenceList = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':ReferenceList');
         $appendTo->appendChild($referenceList);
+
         return $referenceList;
     }
 
@@ -171,6 +172,7 @@ class Enc
                 return $keyToDecrypt->decryptData(base64_decode($cipherValue->nodeValue));
             }
         }
+
         return null;
     }
 
@@ -231,6 +233,7 @@ class Enc
                 return null;
             }
         }
+
         return $node;
     }
 
@@ -339,6 +342,7 @@ class Enc
                 return \ass\XmlSecurity\DSig::getSecurityKeyFromKeyInfo($keyInfo, $algorithm);
             }
         }
+
         return null;
     }
 
@@ -376,6 +380,7 @@ class Enc
         if ($nodes->length > 0) {
             return $nodes;
         }
+
         return null;
     }
 
@@ -402,6 +407,7 @@ class Enc
         if ($nodes->length > 0) {
             return $nodes->item(0);
         }
+
         return null;
     }
 
@@ -428,6 +434,7 @@ class Enc
         if ($nodes->length > 0) {
             return $nodes->item(0);
         }
+
         return null;
     }
 }

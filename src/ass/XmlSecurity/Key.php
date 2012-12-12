@@ -189,6 +189,7 @@ abstract class Key
                 break;
             default:
                 throw new InvalidArgumentException('encryptionType', 'Invalid encryption type given');
+
                 return;
         }
     }
