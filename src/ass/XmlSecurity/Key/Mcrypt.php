@@ -117,6 +117,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
         }
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
+
         return $decryptedData;
     }
 
@@ -145,6 +146,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
         $encryptedData = $this->iv . mcrypt_generic($td, $data);
         mcrypt_generic_deinit($td);
         mcrypt_module_close($td);
+
         return $encryptedData;
     }
 
@@ -163,6 +165,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
                 $keySize = 16;
             }
         }
+
         return $keySize;
     }
 
@@ -202,6 +205,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     protected function generateSessionKey()
     {
         $keySize = $this->getAlgorithmKeySize();
+
         return mcrypt_create_iv($keySize, MCRYPT_RAND);
     }
 
@@ -218,6 +222,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     protected function pkcsPad ($string, $blocksize)
     {
         $pad = $blocksize - (strlen($string) % $blocksize);
+
         return $string . str_repeat(chr($pad), $pad);
     }
 
@@ -234,6 +239,7 @@ abstract class Mcrypt extends \ass\XmlSecurity\Key
     protected function pkcsUnpad($string)
     {
         $pad = ord(substr($string, -1));
+
         return substr($string, 0, -1 * $pad);
     }
 
