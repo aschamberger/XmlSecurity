@@ -170,10 +170,10 @@ class DSig
      * );
      * </code>
      *
-     * @param \DOMElement $signature               Siganture element
+     * @param \DOMElement $signature               Signature element
      * @param \DOMNode    $node                    Node to add to signature
      * @param string      $digestAlgorithm         Digest algorithm
-     * @param string      $transformationAlgorithm Trandformation algorithm
+     * @param string      $transformationAlgorithm Transformation algorithm
      * @param array       $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces)
      *
      * @return \DOMElement
