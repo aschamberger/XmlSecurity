@@ -182,7 +182,7 @@ class DSig
      * @param \DOMNode    $node                    Node to add to signature
      * @param string      $digestAlgorithm         Digest algorithm
      * @param string      $transformationAlgorithm Transformation algorithm
-     * @param array       $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces)
+     * @param array       $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces, force_uri)
      *
      * @return \DOMElement
      */
@@ -204,6 +204,10 @@ class DSig
         if (isset($options['overwrite_id'])) {
             $overwriteId = (bool) $options['overwrite_id'];
         }
+        $forceUri = false;
+        if (isset($options['force_uri'])) {
+            $forceUri = (bool) $options['force_uri'];
+        }
 
         $uri = null;
         if ($node instanceof \DOMElement) {
@@ -221,6 +225,8 @@ class DSig
         $reference = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG . ':Reference');
         if (!is_null($uri)) {
             $reference->setAttribute('URI', $uri);
+        } elseif ($forceUri === true) {
+            $reference->setAttribute('URI', '');
         }
         $signedInfo->appendChild($reference);
 
@@ -605,6 +611,12 @@ class DSig
                 }
 
                 return self::canonicalizeData($node, $transformationAlgorithm, null, $nsPrefixes);
+            case self::TRANSFORMATION_ENVELOPED_SIGNATURE:
+                $xpath = array();
+                // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
+                $xpath['query'] = '(//. | //@* | //namespace::*)[not(ancestor-or-self::dsig:Signature)]';
+                $xpath['namespaces'] = array('dsig' => 'http://www.w3.org/2000/09/xmldsig#');
+                return self::canonicalizeData($node, self::C14N, $xpath);
             default:
                 throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
         }
