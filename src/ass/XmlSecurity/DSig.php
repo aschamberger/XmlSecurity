@@ -614,8 +614,8 @@ class DSig
             case self::TRANSFORMATION_ENVELOPED_SIGNATURE:
                 $xpath = array();
                 // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
-                $xpath['query'] = '(//. | //@* | //namespace::*)[not(ancestor-or-self::dsig:Signature)]';
-                $xpath['namespaces'] = array('dsig' => 'http://www.w3.org/2000/09/xmldsig#');
+                $xpath['query'] = sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG);
+                $xpath['namespaces'] = array(self::PFX_XMLDSIG => self::NS_XMLDSIG);
                 return self::canonicalizeData($node, self::C14N, $xpath);
             default:
                 throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
