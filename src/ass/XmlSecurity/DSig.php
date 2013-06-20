@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file is part of the XmlSecurity library. It is a library written in PHP
  * for working with XML Encryption and Signatures.
@@ -59,6 +60,7 @@ class DSig
     /**
      * XML Signature Syntax and Processing (Second Edition) namespace.
      */
+
     const NS_XMLDSIG = 'http://www.w3.org/2000/09/xmldsig#';
 
     /**
@@ -80,6 +82,13 @@ class DSig
      * Message Digest algorithm SHA512
      */
     const SHA512 = 'http://www.w3.org/2001/04/xmlenc#sha512';
+
+    /**
+     * Enveloped-Signature Transformation Algorithm
+     *
+     * @link http://www.w3.org/TR/xmldsig-core/#sec-EnvelopedSignature
+     */
+    const TRANSFORMATION_ENVELOPED_SIGNATURE = 'http://www.w3.org/2000/09/xmldsig#enveloped-signature';
 
     /**
      * Message Digest algorithm RIPEMD160
@@ -121,11 +130,11 @@ class DSig
             'KeyValue' => array(
                 self,
                 'keyInfoKeyValueResolver',
-           ),
+            ),
             'X509Data' => array(
                 self,
                 'keyInfoX509DataResolver',
-           ),
+            ),
         ),
     );
 
@@ -189,7 +198,7 @@ class DSig
         }
         $idNamespace = null;
         if (isset($options['id_ns_prefix']) && isset($options['id_prefix_ns'])) {
-            $idName = $options['id_ns_prefix'] . ':' .$idName;
+            $idName = $options['id_ns_prefix'] . ':' . $idName;
             $idNamespace = $options['id_prefix_ns'];
         }
         $overwriteId = true;
@@ -224,14 +233,13 @@ class DSig
         $transforms->appendChild($transform);
 
         if ($transformationAlgorithm == self::XPATH && isset($options['xpath_transformation'])) {
-            $xpath = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG.':XPath', $options['xpath_transformation']['query']);
+            $xpath = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG . ':XPath', $options['xpath_transformation']['query']);
             foreach ($options['xpath_transformation']['namespaces'] as $prefix => $value) {
                 $xpath->setAttributeNS('http://www.w3.org/2000/xmlns/', 'xmlns:' . $prefix, $value);
             }
             $transform->appendChild($xpath);
-        } elseif (($transformationAlgorithm == self::EXC_C14N || $transformationAlgorithm == self::EXC_C14N_COMMENTS)
-            && isset($options['inclusive_namespaces'])) {
-            $inclusiveNamespaces  = $doc->createElementNS(self::EXC_C14N, 'es:InclusiveNamespaces');
+        } elseif (($transformationAlgorithm == self::EXC_C14N || $transformationAlgorithm == self::EXC_C14N_COMMENTS) && isset($options['inclusive_namespaces'])) {
+            $inclusiveNamespaces = $doc->createElementNS(self::EXC_C14N, 'es:InclusiveNamespaces');
             $inclusiveNamespaces->setAttributeNS(self::EXC_C14N, 'PrefixList', implode(' ', $options['inclusive_namespaces']));
             $transform->appendChild($inclusiveNamespaces);
         }
@@ -387,20 +395,20 @@ class DSig
     public static function generateUUID()
     {
         return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            // 32 bits for "time_low"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-            // 16 bits for "time_mid"
-            mt_rand(0, 0xffff),
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
-            mt_rand(0, 0x0fff) | 0x4000,
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3fff) | 0x8000,
-            // 48 bits for "node"
-            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+                // 32 bits for "time_low"
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+                // 16 bits for "time_mid"
+                mt_rand(0, 0xffff),
+                // 16 bits for "time_hi_and_version",
+                // four most significant bits holds version number 4
+                mt_rand(0, 0x0fff) | 0x4000,
+                // 16 bits, 8 bits for "clk_seq_hi_res",
+                // 8 bits for "clk_seq_low",
+                // two most significant bits holds zero and one for variant DCE1.1
+                mt_rand(0, 0x3fff) | 0x8000,
+                // 48 bits for "node"
+                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
     }
 
@@ -451,8 +459,7 @@ class DSig
             foreach ($keyInfo->childNodes as $child) {
                 if ($child instanceof \DOMElement) {
                     $key = null;
-                    if (isset(self::$keyInfoResolvers[$child->namespaceURI][$child->localName])
-                        && is_callable(self::$keyInfoResolvers[$child->namespaceURI][$child->localName])) {
+                    if (isset(self::$keyInfoResolvers[$child->namespaceURI][$child->localName]) && is_callable(self::$keyInfoResolvers[$child->namespaceURI][$child->localName])) {
                         $key = call_user_func(self::$keyInfoResolvers[$child->namespaceURI][$child->localName], $child, $algorithm);
                     }
                     if (!is_null($key)) {
@@ -584,7 +591,7 @@ class DSig
                     $xpath = array(
                         'query' => '(.//. | .//@* | .//namespace::*)[' . $options['xpath_transformation']['query'] . ']',
                         'namespaces' => $options['xpath_transformation']['namespaces'],
-                   );
+                    );
                 }
 
                 return self::canonicalizeData($node, self::C14N, $xpath);
@@ -644,10 +651,10 @@ class DSig
 
         $signedInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignedInfo')->item(0);
         if (!is_null($signedInfo)) {
-            $canonicalizationMethod  = $signedInfo->getElementsByTagNameNS(self::NS_XMLDSIG, 'CanonicalizationMethod')->item(0);
+            $canonicalizationMethod = $signedInfo->getElementsByTagNameNS(self::NS_XMLDSIG, 'CanonicalizationMethod')->item(0);
             if (!is_null($canonicalizationMethod)) {
                 $canonicalizationAlgorithm = $canonicalizationMethod->getAttribute('Algorithm');
-                $signatureValue  = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignatureValue')->item(0);
+                $signatureValue = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignatureValue')->item(0);
                 if (!is_null($signatureValue)) {
                     $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm);
                     $decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
@@ -683,7 +690,7 @@ class DSig
         }
         $idNamespace = null;
         if (isset($options['id_ns_prefix']) && isset($options['id_prefix_ns'])) {
-            $idName = $options['id_ns_prefix'] . ':' .$idName;
+            $idName = $options['id_ns_prefix'] . ':' . $idName;
             $idNamespace = $options['id_prefix_ns'];
             $xpath->registerNamespace($options['id_ns_prefix'], $options['id_prefix_ns']);
         }
@@ -697,9 +704,9 @@ class DSig
                     $referenceId = $url['fragment'];
                     // get referenced node
                     if (!is_null($idNamespace)) {
-                        $query = '//*[@' . $idName . '="'.$referenceId . '" or @Id="' . $referenceId . '"]';
+                        $query = '//*[@' . $idName . '="' . $referenceId . '" or @Id="' . $referenceId . '"]';
                     } else {
-                        $query = '//*[@' . $idName.'="' . $referenceId . '"]';
+                        $query = '//*[@' . $idName . '="' . $referenceId . '"]';
                     }
                     $node = $xpath->query($query)->item(0);
                 } else {
@@ -753,4 +760,5 @@ class DSig
 
         return false;
     }
+
 }
