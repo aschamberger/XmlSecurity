@@ -600,7 +600,7 @@ class DSig
 
                 return self::canonicalizeData($node, $transformationAlgorithm, null, $nsPrefixes);
             default:
-                throw new \InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
+                throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
         }
     }
 
