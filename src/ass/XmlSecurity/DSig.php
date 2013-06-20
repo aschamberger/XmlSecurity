@@ -128,11 +128,11 @@ class DSig
     protected static $keyInfoResolvers = array(
         self::NS_XMLDSIG => array(
             'KeyValue' => array(
-                self,
+                __CLASS__,
                 'keyInfoKeyValueResolver',
             ),
             'X509Data' => array(
-                self,
+                __CLASS__,
                 'keyInfoX509DataResolver',
             ),
         ),
@@ -149,8 +149,7 @@ class DSig
      */
     public static function addKeyInfoResolver($ns, $localName, $keyResolver)
     {
-        // don't know why there is a notice for self
-        @self::$keyInfoResolvers[$ns][$localName] = $keyResolver;
+        self::$keyInfoResolvers[$ns][$localName] = $keyResolver;
 
         return null;
     }
