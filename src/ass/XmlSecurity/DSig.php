@@ -616,7 +616,7 @@ class DSig
                 // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
                 $xpath['query'] = sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG);
                 $xpath['namespaces'] = array(self::PFX_XMLDSIG => self::NS_XMLDSIG);
-                return self::canonicalizeData($node, self::C14N, $xpath);
+                return self::canonicalizeData($node, self::EXC_C14N, $xpath);
             default:
                 throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
         }
@@ -710,7 +710,8 @@ class DSig
             $allValid = true;
             foreach ($nodes as $reference) {
                 $isValid = false;
-                if (($uri = $reference->getAttribute('URI')) !== null) {
+                $uri = $reference->getAttribute('URI');
+                if ($uri !== null && $uri !== '') {
                     $url = parse_url($uri);
                     $referenceId = $url['fragment'];
                     // get referenced node
@@ -723,6 +724,7 @@ class DSig
                 } else {
                     $node = $doc;
                 }
+
                 // get tranformation method and canonicalize data
                 $transform = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transform')->item(0);
                 if (!is_null($transform)) {
@@ -750,6 +752,7 @@ class DSig
                             }
                         }
                     }
+
                     $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
                     $digestMethod = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestMethod')->item(0);
                     if (!is_null($digestMethod)) {
