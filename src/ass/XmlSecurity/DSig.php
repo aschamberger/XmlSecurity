@@ -339,7 +339,7 @@ class DSig
      * @return null
      * @throws MissingMandatoryParametersException
      */
-    protected static function checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, $keyAlgorithm, $parameters)
+    protected static function checkMandatoryParametersForPublicKeyCalculation(array $mandatoryParameters, $keyAlgorithm, $parameters)
     {
         foreach ($mandatoryParameters as $parameterName) {
             if (!isset($parameters[$parameterName])) {
@@ -400,20 +400,20 @@ class DSig
     public static function generateUUID()
     {
         return sprintf(
-                '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-                // 32 bits for "time_low"
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff),
-                // 16 bits for "time_mid"
-                mt_rand(0, 0xffff),
-                // 16 bits for "time_hi_and_version",
-                // four most significant bits holds version number 4
-                mt_rand(0, 0x0fff) | 0x4000,
-                // 16 bits, 8 bits for "clk_seq_hi_res",
-                // 8 bits for "clk_seq_low",
-                // two most significant bits holds zero and one for variant DCE1.1
-                mt_rand(0, 0x3fff) | 0x8000,
-                // 48 bits for "node"
-                mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+            // 32 bits for "time_low"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+            // 16 bits for "time_mid"
+            mt_rand(0, 0xffff),
+            // 16 bits for "time_hi_and_version",
+            // four most significant bits holds version number 4
+            mt_rand(0, 0x0fff) | 0x4000,
+            // 16 bits, 8 bits for "clk_seq_hi_res",
+            // 8 bits for "clk_seq_low",
+            // two most significant bits holds zero and one for variant DCE1.1
+            mt_rand(0, 0x3fff) | 0x8000,
+            // 48 bits for "node"
+            mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
         );
     }
 
@@ -616,6 +616,7 @@ class DSig
                 // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
                 $xpath['query'] = sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG);
                 $xpath['namespaces'] = array(self::PFX_XMLDSIG => self::NS_XMLDSIG);
+
                 return self::canonicalizeData($node, self::EXC_C14N, $xpath);
             default:
                 throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
