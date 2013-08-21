@@ -270,12 +270,12 @@ class Enc
         $dataToEncrypt = '';
         switch ($type) {
             case self::ELEMENT:
-                $dataToEncrypt = $doc->saveXML($node);
+                $dataToEncrypt = $node->C14N(false, false);
                 $encryptedData->setAttribute('Type', self::ELEMENT);
                 break;
             case self::CONTENT:
                 foreach ($node->childNodes as $child) {
-                    $dataToEncrypt .= $doc->saveXML($child);
+                    $dataToEncrypt .= $child->C14N(false, false);
                 }
                 $encryptedData->setAttribute('Type', self::CONTENT);
                 break;
