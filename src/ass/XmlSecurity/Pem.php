@@ -104,7 +104,7 @@ class Pem
     /**
      * The object identifier for RSA Keys (1.2.840.113549.1.1.1)
      */
-    const OBJECT_IDENTIFIER_RSA = "x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01";
+    const OBJECT_IDENTIFIER_RSA = "\x06\x09\x2a\x86\x48\x86\xf7\x0d\x01\x01\x01";
 
     /**
      * Encode a subset of data types into ASN.1 encoding format.
@@ -116,7 +116,7 @@ class Pem
      */
     private static function encodeAsnData($type, $data)
     {
-        if (($type === ASN_TYPE_INTEGER && ord($data) > 0x7f) || $type === ASN_TYPE_BITSTRING) {
+        if (($type === self::ASN_TYPE_INTEGER && ord($data) > 0x7f) || $type === self::ASN_TYPE_BITSTRING) {
             $data = chr(0) . $data;
         }
         $length = strlen($data);
@@ -154,10 +154,13 @@ class Pem
     /**
      * Transform a RSA Key in Modulus/Exponent format into PEM encoding.
      *
-     * @param string $modulus  Modulus
-     * @param string $exponent Exponent
+     * @param string $modulus  RSA Modulus in binary format
+     * @param string $exponent RSA exponent in binary format
      *
      * @return string
+     *
+     * @see: https://polarssl.org/kb/cryptography/asn1-key-structures-in-der-and-pem
+     * @see: http://lapo.it/asn1js/
      */
     public static function getPublicKeyFromModExp($modulus, $exponent)
     {
@@ -165,7 +168,7 @@ class Pem
         $publicKey = self::encodeAsnData(self::ASN_TYPE_SEQUENCE,
             self::encodeAsnData(self::ASN_TYPE_SEQUENCE,
                 self::OBJECT_IDENTIFIER_RSA .
-                "\0"
+                "\x05\x00"
             ) .
             self::encodeAsnData(self::ASN_TYPE_BITSTRING,
                 self::encodeAsnData(self::ASN_TYPE_SEQUENCE,
@@ -176,7 +179,7 @@ class Pem
         );
         $publicKeyBase64 = base64_encode($publicKey);
 
-        return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
+        return self::formatKeyInPemFormat($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
     }
 
     /**
@@ -207,7 +210,7 @@ class Pem
         );
         $publicKeyBase64 = base64_encode($publicKey);
 
-        return self::formatKeyInPem($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
+        return self::formatKeyInPemFormat($publicKeyBase64, self::PEM_TYPE_PUBLIC_X509);
     }
 
     /**
