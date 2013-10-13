@@ -620,10 +620,13 @@ class DSig
 
                 return self::canonicalizeData($node, $transformationAlgorithm, null, $nsPrefixes);
             case self::TRANSFORMATION_ENVELOPED_SIGNATURE:
-                $xpath = array();
                 // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
-                $xpath['query'] = sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG);
-                $xpath['namespaces'] = array(self::PFX_XMLDSIG => self::NS_XMLDSIG);
+                $xpath = array(
+                    'query' => sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG),
+                    'namespaces' => array(
+                        self::PFX_XMLDSIG => self::NS_XMLDSIG
+                    ),
+                );
 
                 return self::canonicalizeData($node, self::EXC_C14N, $xpath);
             default:
