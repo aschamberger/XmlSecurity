@@ -118,6 +118,16 @@ abstract class Key
     const RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
 
     /**
+     * Signature RSAwithSHA384
+     */
+    const RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
+
+    /**
+     * Signature RSAwithSHA512
+     */
+    const RSA_SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
+
+    /**
      * Encryption key.
      *
      * @var string
@@ -186,6 +196,12 @@ abstract class Key
                 break;
             case self::RSA_SHA256:
                 return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, $keyIsFile, $passphrase);
+                break;
+            case self::RSA_SHA384:
+                return new \ass\XmlSecurity\Key\RsaSha384($keyType, $key, $keyIsFile, $passphrase);
+                break;
+            case self::RSA_SHA512:
+                return new \ass\XmlSecurity\Key\RsaSha512($keyType, $key, $keyIsFile, $passphrase);
                 break;
             default:
                 throw new InvalidArgumentException('encryptionType', 'Invalid encryption type given');

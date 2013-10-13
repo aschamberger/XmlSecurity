@@ -76,12 +76,17 @@ class DSig
     /**
      * Message Digest algorithm SHA256
      */
-    const SHA256 = 'http://www.w3.org/2001/04/xmlenc#sha256';
+    const SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#sha256';
+
+    /**
+     * Message Digest algorithm SHA384
+     */
+    const SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#sha384';
 
     /**
      * Message Digest algorithm SHA512
      */
-    const SHA512 = 'http://www.w3.org/2001/04/xmlenc#sha512';
+    const SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#sha512';
 
     /**
      * Enveloped-Signature Transformation Algorithm
@@ -277,6 +282,9 @@ class DSig
                 break;
             case self::SHA256:
                 $algorithm = 'sha256';
+                break;
+            case self::SHA384:
+                $algorithm = 'sha512';
                 break;
             case self::SHA512:
                 $algorithm = 'sha512';
