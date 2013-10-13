@@ -453,6 +453,27 @@ class DSig
     }
 
     /**
+     * Create a ds:KeyInfo with X509 certificate from given Key object
+     *
+     * @param \DOMDocument         $doc  DOMDocument to add the KeyInfo
+     * @param \ass\XmlSecurity\Key $cert Key containing certificate
+     *
+     * @return DOMElement
+     */
+    public static function createX509CertificateKeyInfo(\DOMDocument $doc, Key $cert)
+    {
+        $publicCertificate = $cert->getX509Certificate(true);
+
+        $keyInfo = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':KeyInfo');
+        $x509Data = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':X509Data');
+        $keyInfo->appendChild($x509Data);
+        $x509Certificate = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':X509Certificate', $publicCertificate);
+        $x509Data->appendChild($x509Certificate);
+
+        return $keyInfo;
+    }
+
+    /**
      * Gets the security key references within the given KeyInfo element.
      *
      * You can add your own key resolver by calling:
@@ -552,7 +573,7 @@ class DSig
         if (!is_null($x509Certificate)) {
             $certificate = \ass\XmlSecurity\Pem::formatKeyInPemFormat($x509Certificate->textContent);
 
-            return \ass\XmlSecurity\Key::factory($algorithm, $certificate, \ass\XmlSecurity\Key::TYPE_PUBLIC);
+            return \ass\XmlSecurity\Key::factory($algorithm, $certificate, false, \ass\XmlSecurity\Key::TYPE_PUBLIC);
         }
 
         return null;
@@ -742,27 +763,31 @@ class DSig
                 if (!is_null($transform)) {
                     $transformationAlgorithm = $transform->getAttribute('Algorithm');
                     $options = array();
-                    if ($transformationAlgorithm == self::XPATH) {
-                        $xpath = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
-                        if (!is_null($xpath)) {
-                            $options['xpath_transformation']['query'] = $xpath->nodeValue;
-                            $options['xpath_transformation']['namespaces'] = array();
-                            $nslist = $xpath->query('./namespace::*', $node);
-                            foreach ($nslist as $nsnode) {
-                                if ($nsnode->localName != 'xml') {
-                                    $options['xpath_transformation']['namespaces'][$nsnode->localName] = $nsnode->nodeValue;
+
+                    switch ($transformationAlgorithm) {
+                        case self::XPATH:
+                            $xpath = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
+                            if (!is_null($xpath)) {
+                                $options['xpath_transformation']['query'] = $xpath->nodeValue;
+                                $options['xpath_transformation']['namespaces'] = array();
+                                $nslist = $xpath->query('./namespace::*', $node);
+                                foreach ($nslist as $nsnode) {
+                                    if ($nsnode->localName != 'xml') {
+                                        $options['xpath_transformation']['namespaces'][$nsnode->localName] = $nsnode->nodeValue;
+                                    }
                                 }
                             }
-                        }
-                    } elseif ($transformationAlgorithm == self::EXC_C14N) {
-                        $inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
-                        if (!is_null($inclusiveNamespaces)) {
-                            $prefixList = $transform->getAttribute('PrefixList');
-                            $nsPrefixes = explode(' ', $prefixList);
-                            if (count($nsPrefixes) > 0) {
-                                $options['inclusive_namespaces'] = $nsPrefixes;
+                            break;
+                        case self::EXC_C14N:
+                            $inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
+                            if (!is_null($inclusiveNamespaces)) {
+                                $prefixList = $transform->getAttribute('PrefixList');
+                                $nsPrefixes = explode(' ', $prefixList);
+                                if (count($nsPrefixes) > 0) {
+                                    $options['inclusive_namespaces'] = $nsPrefixes;
+                                }
                             }
-                        }
+                            break;
                     }
 
                     $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
