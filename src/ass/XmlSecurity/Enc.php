@@ -43,6 +43,11 @@
 
 namespace ass\XmlSecurity;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
+
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 
 /**
@@ -91,27 +96,59 @@ class Enc
     const RETRIEVAL_METHOD_ENCRYPTED_KEY = 'http://www.w3.org/2001/04/xmlenc#EncryptedKey';
 
     /**
+     * Create a ds:KeyInfo with ds:RetrievalMethod type
+     * "http://www.w3.org/2001/04/xmlenc#EncryptedKey"
+     *
+     * @param \DOMDocument $doc  DOMDocument to add the KeyInfo
+     * @param string       $guid Unique id
+     *
+     * @return DOMElement
+     */
+    public static function createEncryptedKeyReferenceKeyInfo(DOMDocument $doc, $guid)
+    {
+        $keyInfo = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':KeyInfo');
+        $retrievalMethod = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':RetrievalMethod');
+        $retrievalMethod->setAttribute('URI', '#'.$guid);
+        $retrievalMethod->setAttribute('Type', self::RETRIEVAL_METHOD_ENCRYPTED_KEY);
+        $keyInfo->appendChild($retrievalMethod);
+
+        return $keyInfo;
+    }
+
+    /**
      * Creates a new EncryptedKey node and appends it to the given node.
      *
-     * @param string               $guid             Unique id
+     * @param string               $guid             Unique id/if null wrap in ds:KeyInfo
      * @param \ass\XmlSecurity\Key $keyToBeEncrypted Key that should be encrypted
      * @param \ass\XmlSecurity\Key $keyForEncryption Key to use for encryption
-     * @param \DOMNode             $appendTo         Node where encrypted key should be appenden
+     * @param \DOMNode             $appendTo         Node where encrypted key should be appended
      * @param \DOMNode             $insertBefore     Encrypted key should be inserted before this node
      * @param \DOMElement          $keyInfo          KeyInfo element
      *
      * @return \DOMElement
      */
-    public static function createEncryptedKey($guid, \ass\XmlSecurity\Key $keyToBeEncrypted, \ass\XmlSecurity\Key $keyForEncryption, \DOMNode $appendTo, \DOMNode $insertBefore = null, \DOMElement $keyInfo = null)
+    public static function createEncryptedKey($guid, Key $keyToBeEncrypted, Key $keyForEncryption, DOMNode $appendTo, DOMNode $insertBefore = null, DOMElement $keyInfo = null)
     {
         $doc = $appendTo->ownerDocument;
         $encryptedKey = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':EncryptedKey');
-        $encryptedKey->setAttribute('Id', $guid);
 
-        if (!is_null($insertBefore)) {
-            $appendTo->insertBefore($encryptedKey, $insertBefore);
+        if (null === $guid) {
+            $wrappedKeyInfo = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':KeyInfo');
+            $wrappedKeyInfo->appendChild($encryptedKey);
+
+            if (!is_null($insertBefore)) {
+                $appendTo->insertBefore($wrappedKeyInfo, $insertBefore);
+            } else {
+                $appendTo->appendChild($wrappedKeyInfo);
+            }
         } else {
-            $appendTo->appendChild($encryptedKey);
+            $encryptedKey->setAttribute('Id', $guid);
+
+            if (!is_null($insertBefore)) {
+                $appendTo->insertBefore($encryptedKey, $insertBefore);
+            } else {
+                $appendTo->appendChild($encryptedKey);
+            }
         }
 
         $encryptionMethod = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':EncryptionMethod');
@@ -140,7 +177,7 @@ class Enc
      *
      * @return \DOMElement
      */
-    public static function createReferenceList(\DOMElement $appendTo)
+    public static function createReferenceList(DOMElement $appendTo)
     {
         $doc = $appendTo->ownerDocument;
         $referenceList = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':ReferenceList');
@@ -159,7 +196,7 @@ class Enc
      *
      * @return string|null
      */
-    public static function decryptEncryptedKey(\DOMElement $encryptedKey, \ass\XmlSecurity\Key $keyToDecrypt = null)
+    public static function decryptEncryptedKey(DOMElement $encryptedKey, Key $keyToDecrypt = null)
     {
         if (is_null($keyToDecrypt)) {
             $keyToDecrypt = self::getSecurityKey($encryptedKey);
@@ -186,9 +223,9 @@ class Enc
      *
      * @return \DOMNode|null
      */
-    public static function decryptNode(\DOMNode $node, $key = null)
+    public static function decryptNode(DOMNode $node, $key = null)
     {
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
             $encryptedData = $node->documentElement->getElementsByTagNameNS(self::NS_XMLENC, 'EncryptedData')->item(0);
         } else {
@@ -208,8 +245,8 @@ class Enc
                 // replace nodes
                 switch ($type) {
                     case self::ELEMENT:
-                        if ($node instanceof \DOMDocument) {
-                            $node = new \DOMDocument();
+                        if ($node instanceof DOMDocument) {
+                            $node = new DOMDocument();
                             $node->loadXML($decryptedDataString);
                         } else {
                             $documentFragment = $doc->createDocumentFragment();
@@ -221,7 +258,7 @@ class Enc
                     case self::CONTENT:
                         $documentFragment = $doc->createDocumentFragment();
                         $documentFragment->appendXML($decryptedDataString);
-                        if ($node instanceof \DOMDocument) {
+                        if ($node instanceof DOMDocument) {
                             $node->documentElement->replaceChild($documentFragment, $node->documentElement->firstChild);
                         } else {
                             $node->parentNode->replaceChild($documentFragment, $node);
@@ -248,20 +285,22 @@ class Enc
      *
      * @return \DOMNode
      */
-    public static function encryptNode(\DOMNode $node, $type, \ass\XmlSecurity\Key $key, \DOMElement $referenceList = null, $keyInfo = null)
+    public static function encryptNode(DOMNode $node, $type, Key $key, DOMElement $referenceList = null, $keyInfo = null)
     {
         if ($type != self::ELEMENT && $type != self::CONTENT) {
             throw InvalidArgumentException('type', 'Value must be either \ass\XmlSecurity\Enc::CONTENT or \ass\XmlSecurity\Enc::ELEMENT');
         }
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
         } else {
             $doc = $node->ownerDocument;
         }
-        $uri = 'Id-' . \ass\XmlSecurity\DSig::generateUUID();
 
         $encryptedData = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':EncryptedData');
-        $encryptedData->setAttribute("Id", $uri);
+        if (null !== $referenceList) {
+            $uri = 'Id-' . DSig::generateUUID();
+            $encryptedData->setAttribute("Id", $uri);
+        }
         $cipherData = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':CipherData');
         $encryptedData->appendChild($cipherData);
         $cipherValue = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':CipherValue');
@@ -296,7 +335,7 @@ class Enc
         // replace nodes
         switch ($type) {
             case self::ELEMENT:
-                if ($node instanceof \DOMDocument) {
+                if ($node instanceof DOMDocument) {
                     $node->replaceChild($encryptedData, $node->documentElement);
                 } else {
                     $node->parentNode->replaceChild($encryptedData, $node);
@@ -310,13 +349,13 @@ class Enc
                 break;
         }
 
-        if (!is_null($referenceList)) {
+        if (null !== $referenceList) {
             $dataReference = $doc->createElementNS(self::NS_XMLENC, self::PFX_XMLENC . ':DataReference');
             $dataReference->setAttribute('URI', '#' . $uri);
             $referenceList->appendChild($dataReference);
         }
 
-        return $node;
+        return $encryptedData;
     }
 
     /**
@@ -328,18 +367,45 @@ class Enc
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $encryptedData Encrypted data element
+     * @param \DOMElement          $encryptedData Encrypted data element
+     * @param \ass\XmlSecurity\Key $key           Key to decrypt EncryptedKey
      *
      * @return \ass\XmlSecurity\Key|null
      */
-    public static function getSecurityKey(\DOMElement $encryptedData)
+    public static function getSecurityKey(DOMElement $encryptedData, Key $key = null)
     {
         $encryptedMethod = $encryptedData->getElementsByTagNameNS(self::NS_XMLENC, 'EncryptionMethod')->item(0);
         if (!is_null($encryptedMethod)) {
             $algorithm = $encryptedMethod->getAttribute('Algorithm');
-            $keyInfo = $encryptedData->getElementsByTagNameNS(\ass\XmlSecurity\DSig::NS_XMLDSIG, 'KeyInfo')->item(0);
+            $keyInfo = $encryptedData->getElementsByTagNameNS(DSig::NS_XMLDSIG, 'KeyInfo')->item(0);
             if (!is_null($keyInfo)) {
-                return \ass\XmlSecurity\DSig::getSecurityKeyFromKeyInfo($keyInfo, $algorithm);
+                if (null !== $key) {
+                    $encryptedKey = self::locateEncryptedKey($keyInfo);
+                    if (null !== $encryptedKey) {
+                        $keyString = Enc::decryptEncryptedKey($encryptedKey, $key);
+
+                        return Key::factory($algorithm, $keyString, false, Key::TYPE_PRIVATE);
+                    } else {
+                        $keyResolver = function(DOMElement $node, $algorithm) use ($key) {
+                            if (self::RETRIEVAL_METHOD_ENCRYPTED_KEY == $node->getAttribute('Type')) {
+                                $uri = $node->getAttribute('URI');
+                                $referencedNode = self::getReferenceNodeForUri($node, $uri);
+
+                                if (null !== $referencedNode && self::NS_XMLENC == $referencedNode->namespaceURI
+                                        && 'EncryptedKey' == $referencedNode->localName) {
+                                    $keyString = self::decryptEncryptedKey($referencedNode, $key);
+
+                                    return Key::factory($algorithm, $keyString, false, Key::TYPE_PRIVATE);
+                                }
+                            }
+
+                            return null;
+                        };
+                        DSig::addKeyInfoResolver(DSig::NS_XMLDSIG, 'RetrievalMethod', $keyResolver);
+                    }
+                }
+
+                return DSig::getSecurityKeyFromKeyInfo($keyInfo, $algorithm);
             }
         }
 
@@ -354,16 +420,16 @@ class Enc
      *
      * @return \DOMNodeList
      */
-    public static function locateEncryptedData(\DOMNode $node, \DOMElement $referenceList = null)
+    public static function locateEncryptedData(DOMNode $node, DOMElement $referenceList = null)
     {
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
             $relativeTo = null;
         } else {
             $doc = $node->ownerDocument;
             $relativeTo = $node;
         }
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $xpath->registerNamespace('xenc', self::NS_XMLENC);
         if (!is_null($referenceList)) {
             $query = array();
@@ -374,9 +440,9 @@ class Enc
             }
             $query = implode(' | ', $query);
         } else {
-            $query = './/xenc:EncryptedData';
+            $query = '//xenc:EncryptedData';
         }
-        $nodes = $xpath->query($query);
+        $nodes = $xpath->query($query, $relativeTo);
         if ($nodes->length > 0) {
             return $nodes;
         }
@@ -391,16 +457,16 @@ class Enc
      *
      * @return \DOMElement
      */
-    public static function locateEncryptedKey(\DOMNode $node)
+    public static function locateEncryptedKey(DOMNode $node)
     {
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
             $relativeTo = null;
         } else {
             $doc = $node->ownerDocument;
             $relativeTo = $node;
         }
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $xpath->registerNamespace('xenc', self::NS_XMLENC);
         $query = './/xenc:EncryptedKey';
         $nodes = $xpath->query($query, $relativeTo);
@@ -416,18 +482,18 @@ class Enc
      *
      * @param \DOMNode $node Node where reference list should be located
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
-    public static function locateReferenceList(\DOMNode $node)
+    public static function locateReferenceList(DOMNode $node)
     {
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
             $relativeTo = null;
         } else {
             $doc = $node->ownerDocument;
             $relativeTo = $node;
         }
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $xpath->registerNamespace('xenc', self::NS_XMLENC);
         $query = './/xenc:ReferenceList';
         $nodes = $xpath->query($query, $relativeTo);
@@ -436,5 +502,23 @@ class Enc
         }
 
         return null;
+    }
+
+    /**
+     * Gets the referenced node for the given URI.
+     *
+     * @param \DOMElement $node Node
+     * @param string      $uri  URI
+     *
+     * @return \DOMElement
+     */
+    public static function getReferenceNodeForUri(DOMElement $node, $uri)
+    {
+        $url = parse_url($uri);
+        $referenceId = $url['fragment'];
+        $query = '//*[@Id="'.$referenceId.'"]';
+        $xpath = new DOMXPath($node->ownerDocument);
+
+        return $xpath->query($query)->item(0);
     }
 }

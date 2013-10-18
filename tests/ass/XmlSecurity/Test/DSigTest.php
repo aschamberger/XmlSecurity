@@ -2,6 +2,8 @@
 
 namespace ass\XmlSecurity\Tests;
 
+use DOMDocument;
+
 use ass\XmlSecurity\DSig;
 use ass\XmlSecurity\Key;
 
@@ -16,7 +18,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyWithCommentEmptyUri()
     {
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->load($this->fixturesDir.'/DSig/withcomment_empty_uri.xml');
 
         $signature = DSig::locateSignature($doc);
@@ -29,7 +31,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyWithCommentIdUri()
     {
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->load($this->fixturesDir.'/DSig/withcomment_id_uri.xml');
 
         $signature = DSig::locateSignature($doc);
@@ -47,7 +49,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyDocumentSha1()
     {
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->load($this->fixturesDir.'/DSig/sign_document_sha1_result.xml');
 
         $signature = DSig::locateSignature($doc);
@@ -60,7 +62,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
 
     public function testVerifyDocumentSha256()
     {
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->load($this->fixturesDir.'/DSig/sign_document_sha256_result.xml');
 
         $signature = DSig::locateSignature($doc);
@@ -77,7 +79,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
         $key = Key::factory(Key::RSA_SHA1, $this->fixturesDir.'/privkey.pem', true, Key::TYPE_PRIVATE);
         $cert = Key::factory(Key::RSA_SHA1, $this->fixturesDir.'/mycert.pem', true, Key::TYPE_PUBLIC);
 
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->formatOutput = true;
         $doc->load($this->fixturesDir.'/DSig/sign_document.xml');
 
@@ -88,7 +90,6 @@ class DSigTest extends \PHPUnit_Framework_TestCase
         DSig::signDocument($signature, $key, DSig::EXC_C14N);
 
         $file = $this->fixturesDir.'/DSig/sign_document_sha1_result.xml';
-        $doc->save($file);
         $this->assertXmlStringEqualsXmlFile($file, $doc->saveXML(), "Sign document with SHA1");
     }
 
@@ -98,7 +99,7 @@ class DSigTest extends \PHPUnit_Framework_TestCase
         $key = Key::factory(Key::RSA_SHA256, $this->fixturesDir.'/privkey.pem', true, Key::TYPE_PRIVATE);
         $cert = Key::factory(Key::RSA_SHA256, $this->fixturesDir.'/mycert.pem', true, Key::TYPE_PUBLIC);
 
-        $doc = new \DOMDocument();
+        $doc = new DOMDocument();
         $doc->formatOutput = true;
         $doc->load($this->fixturesDir.'/DSig/sign_document.xml');
 
@@ -109,7 +110,6 @@ class DSigTest extends \PHPUnit_Framework_TestCase
         DSig::signDocument($signature, $key, DSig::EXC_C14N);
 
         $file = $this->fixturesDir.'/DSig/sign_document_sha256_result.xml';
-        $doc->save($file);
         $this->assertXmlStringEqualsXmlFile($file, $doc->saveXML(), "Sign document with SHA256");
     }
 }

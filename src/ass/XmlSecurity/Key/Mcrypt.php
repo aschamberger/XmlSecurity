@@ -43,6 +43,8 @@
 
 namespace ass\XmlSecurity\Key;
 
+use ass\XmlSecurity\Key;
+
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 
 /**
@@ -52,7 +54,7 @@ use ass\XmlSecurity\Exception\InvalidArgumentException;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-abstract class Mcrypt extends \ass\XmlSecurity\Key
+abstract class Mcrypt extends Key
 {
     /**
      * Mcrypt cipher type.

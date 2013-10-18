@@ -44,6 +44,11 @@
 
 namespace ass\XmlSecurity;
 
+use DOMDocument;
+use DOMElement;
+use DOMNode;
+use DOMXPath;
+
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 use ass\XmlSecurity\Exception\MissingMandatoryParametersException;
 
@@ -191,7 +196,7 @@ class DSig
      *
      * @return \DOMElement
      */
-    public static function addNodeToSignature(\DOMElement $signature, \DOMNode $node, $digestAlgorithm, $transformationAlgorithm, array $options = array())
+    public static function addNodeToSignature(DOMElement $signature, DOMNode $node, $digestAlgorithm, $transformationAlgorithm, array $options = array())
     {
         $doc = $signature->ownerDocument;
         $signedInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignedInfo')->item(0);
@@ -215,7 +220,7 @@ class DSig
         }
 
         $uri = null;
-        if ($node instanceof \DOMElement) {
+        if ($node instanceof DOMElement) {
             $idAttributeValue = null;
             if ($overwriteId === false) {
                 $idAttributeValue = $node->getAttributeNS($idNamespace, $idName);
@@ -309,7 +314,7 @@ class DSig
      *
      * @return string
      */
-    private static function canonicalizeData(\DOMNode $node, $canonicalizationAlgorithm, $xpath = null, $nsPrefixes = null)
+    private static function canonicalizeData(DOMNode $node, $canonicalizationAlgorithm, $xpath = null, $nsPrefixes = null)
     {
         $exclusive = false;
         $withComments = false;
@@ -369,7 +374,7 @@ class DSig
      *
      * @return \DOMElement
      */
-    public static function createSignature(\ass\XmlSecurity\Key $keyForSignature, $canonicalizationAlgorithm, \DOMNode $appendTo, \DOMNode $insertBefore = null, \DOMElement $keyInfo = null)
+    public static function createSignature(Key $keyForSignature, $canonicalizationAlgorithm, DOMNode $appendTo, DOMNode $insertBefore = null, DOMElement $keyInfo = null)
     {
         $doc = $appendTo->ownerDocument;
         $signature = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG . ':Signature');
@@ -438,7 +443,7 @@ class DSig
      *
      * @return \ass\XmlSecurity\Key|null
      */
-    public static function getSecurityKey(\DOMElement $signature)
+    public static function getSecurityKey(DOMElement $signature)
     {
         $encryptedMethod = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignatureMethod')->item(0);
         if (!is_null($encryptedMethod)) {
@@ -460,7 +465,7 @@ class DSig
      *
      * @return DOMElement
      */
-    public static function createX509CertificateKeyInfo(\DOMDocument $doc, Key $cert)
+    public static function createX509CertificateKeyInfo(DOMDocument $doc, Key $cert)
     {
         $publicCertificate = $cert->getX509Certificate(true);
 
@@ -487,11 +492,11 @@ class DSig
      *
      * @return \ass\XmlSecurity\Key|null
      */
-    public static function getSecurityKeyFromKeyInfo(\DOMElement $keyInfo, $algorithm)
+    public static function getSecurityKeyFromKeyInfo(DOMElement $keyInfo, $algorithm)
     {
         if (!is_null($keyInfo)) {
             foreach ($keyInfo->childNodes as $child) {
-                if ($child instanceof \DOMElement) {
+                if ($child instanceof DOMElement) {
                     $key = null;
                     if (isset(self::$keyInfoResolvers[$child->namespaceURI][$child->localName]) && is_callable(self::$keyInfoResolvers[$child->namespaceURI][$child->localName])) {
                         $key = call_user_func(self::$keyInfoResolvers[$child->namespaceURI][$child->localName], $child, $algorithm);
@@ -515,7 +520,7 @@ class DSig
      * @return \ass\XmlSecurity\Key|null
      * @throws MissingMandatoryParametersException
      */
-    private static function keyInfoKeyValueResolver(\DOMElement $node, $algorithm)
+    private static function keyInfoKeyValueResolver(DOMElement $node, $algorithm)
     {
         foreach ($node->childNodes as $key) {
             if ($key->namespaceURI == self::NS_XMLDSIG) {
@@ -534,9 +539,9 @@ class DSig
                         // throws exception if mandatory parameters check fails
                         self::checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, 'DSA', $parameters);
                         // calculate public key
-                        $publicKey = \ass\XmlSecurity\Pem::getPublicKeyFromPqgy($parameters['P'], $parameters['Q'], $parameters['G'], $parameters['Y']);
+                        $publicKey = Pem::getPublicKeyFromPqgy($parameters['P'], $parameters['Q'], $parameters['G'], $parameters['Y']);
 
-                        return \ass\XmlSecurity\Key::factory($algorithm, $publicKey, \ass\XmlSecurity\Key::TYPE_PUBLIC);
+                        return Key::factory($algorithm, $publicKey, Key::TYPE_PUBLIC);
                     case 'RSAKeyValue':
                         $parameters = array();
                         foreach ($key->childNodes as $parameter) {
@@ -549,9 +554,9 @@ class DSig
                         // throws exception if mandatory parameters check fails
                         self::checkMandatoryParametersForPublicKeyCalculation($mandatoryParameters, 'DSA', $parameters);
                         // calculate public key
-                        $publicKey = \ass\XmlSecurity\Pem::getPublicKeyFromModExp($parameters['Modulus'], $parameters['Exponent']);
+                        $publicKey = Pem::getPublicKeyFromModExp($parameters['Modulus'], $parameters['Exponent']);
 
-                        return \ass\XmlSecurity\Key::factory($algorithm, $publicKey, \ass\XmlSecurity\Key::TYPE_PUBLIC);
+                        return Key::factory($algorithm, $publicKey, Key::TYPE_PUBLIC);
                 }
             }
         }
@@ -567,13 +572,13 @@ class DSig
      *
      * @return \ass\XmlSecurity\Key|null
      */
-    private static function keyInfoX509DataResolver(\DOMElement $node, $algorithm)
+    private static function keyInfoX509DataResolver(DOMElement $node, $algorithm)
     {
         $x509Certificate = $node->getElementsByTagNameNS(self::NS_XMLDSIG, 'X509Certificate')->item(0);
         if (!is_null($x509Certificate)) {
-            $certificate = \ass\XmlSecurity\Pem::formatKeyInPemFormat($x509Certificate->textContent);
+            $certificate = Pem::formatKeyInPemFormat($x509Certificate->textContent);
 
-            return \ass\XmlSecurity\Key::factory($algorithm, $certificate, false, \ass\XmlSecurity\Key::TYPE_PUBLIC);
+            return Key::factory($algorithm, $certificate, false, Key::TYPE_PUBLIC);
         }
 
         return null;
@@ -586,16 +591,16 @@ class DSig
      *
      * @return \DOMElement
      */
-    public static function locateSignature(\DOMNode $node)
+    public static function locateSignature(DOMNode $node)
     {
-        if ($node instanceof \DOMDocument) {
+        if ($node instanceof DOMDocument) {
             $doc = $node;
             $relativeTo = null;
         } else {
             $doc = $node->ownerDocument;
             $relativeTo = $node;
         }
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
         $xpath->registerNamespace('ds', self::NS_XMLDSIG);
         $query = './/ds:Signature';
         $nodes = $xpath->query($query, $relativeTo);
@@ -615,7 +620,7 @@ class DSig
      *
      * @return string
      */
-    private static function processTransform(\DOMNode $node, $transformationAlgorithm, array $options = array())
+    private static function processTransform(DOMNode $node, $transformationAlgorithm, array $options = array())
     {
         switch ($transformationAlgorithm) {
             case self::XPATH:
@@ -664,7 +669,7 @@ class DSig
      *
      * @return \DOMElement
      */
-    public static function signDocument(\DOMElement $signature, \ass\XmlSecurity\Key $keyForSignature, $canonicalizationAlgorithm)
+    public static function signDocument(DOMElement $signature, Key $keyForSignature, $canonicalizationAlgorithm)
     {
         $doc = $signature->ownerDocument;
         $signedInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignedInfo')->item(0);
@@ -687,7 +692,7 @@ class DSig
      *
      * @return boolean
      */
-    public static function verifyDocumentSignature(\DOMElement $signature, \ass\XmlSecurity\Key $keyForSignature = null)
+    public static function verifyDocumentSignature(DOMElement $signature, Key $keyForSignature = null)
     {
         if (is_null($keyForSignature)) {
             $keyForSignature = self::getSecurityKey($signature);
@@ -719,14 +724,14 @@ class DSig
      *
      * @return boolean
      */
-    public static function verifyReferences(\DOMElement $signature, array $options = array())
+    public static function verifyReferences(DOMElement $signature, array $options = array())
     {
-        if ($signature instanceof \DOMDocument) {
+        if ($signature instanceof DOMDocument) {
             $doc = $signature;
         } else {
             $doc = $signature->ownerDocument;
         }
-        $xpath = new \DOMXPath($doc);
+        $xpath = new DOMXPath($doc);
 
         $idName = 'Id';
         if (isset($options['id_name'])) {
