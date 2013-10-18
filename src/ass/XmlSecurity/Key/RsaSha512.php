@@ -49,18 +49,21 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class Aes192Cbc extends Mcrypt
+class RsaSha512 extends Openssl
 {
     /**
-     * Constructor.
+     * Loads the given cryptographic key for the class.
      *
-     * @param string $key Key string
+     * @param string  $keyType    \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string  $key        Key string or filename
+     * @param boolean $isFile     Is parameter key a filename
+     * @param string  $passphrase Passphrase for given key
      */
-    public function __construct($key = null)
+    public function __construct($keyType, $key, $isFile = false, $passphrase = null)
     {
-        $this->cipher = MCRYPT_RIJNDAEL_128;
-        $this->mode   = MCRYPT_MODE_CBC;
-        $this->type   = self::AES192_CBC;
-        parent::__construct($key);
+        $this->digest  = 'SHA512';
+        $this->padding = OPENSSL_PKCS1_PADDING;
+        $this->type    = self::RSA_SHA512;
+        parent::__construct($keyType, $key, $isFile, $passphrase);
     }
 }

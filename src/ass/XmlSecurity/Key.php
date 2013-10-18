@@ -45,6 +45,17 @@ namespace ass\XmlSecurity;
 
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 
+use ass\XmlSecurity\Key\TripleDesCbc;
+use ass\XmlSecurity\Key\Aes128Cbc;
+use ass\XmlSecurity\Key\Aes192Cbc;
+use ass\XmlSecurity\Key\Aes256Cbc;
+use ass\XmlSecurity\Key\Rsa15;
+use ass\XmlSecurity\Key\RsaOaepMgf1p;
+use ass\XmlSecurity\Key\RsaSha1;
+use ass\XmlSecurity\Key\RsaSha256;
+use ass\XmlSecurity\Key\RsaSha384;
+use ass\XmlSecurity\Key\RsaSha512;
+
 /**
  * This class holds a security key and provides the necessary encryption,
  * decryption and certificate handling routines.
@@ -118,6 +129,16 @@ abstract class Key
     const RSA_SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha256';
 
     /**
+     * Signature RSAwithSHA384
+     */
+    const RSA_SHA384 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha384';
+
+    /**
+     * Signature RSAwithSHA512
+     */
+    const RSA_SHA512 = 'http://www.w3.org/2001/04/xmldsig-more#rsa-sha512';
+
+    /**
      * Encryption key.
      *
      * @var string
@@ -164,28 +185,34 @@ abstract class Key
     {
         switch ($encryptionType) {
             case self::TRIPLEDES_CBC:
-                return new \ass\XmlSecurity\Key\TripleDesCbc($key);
+                return new TripleDesCbc($key);
                 break;
             case self::AES128_CBC:
-                return new \ass\XmlSecurity\Key\Aes128Cbc($key);
+                return new Aes128Cbc($key);
                 break;
             case self::AES192_CBC:
-                return new \ass\XmlSecurity\Key\Aes192Cbc($key);
+                return new Aes192Cbc($key);
                 break;
             case self::AES256_CBC:
-                return new \ass\XmlSecurity\Key\Aes256Cbc($key);
+                return new Aes256Cbc($key);
                 break;
             case self::RSA_1_5:
-                return new \ass\XmlSecurity\Key\Rsa15($keyType, $key, $keyIsFile, $passphrase);
+                return new Rsa15($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_OAEP_MGF1P:
-                return new \ass\XmlSecurity\Key\RsaOaepMgf1p($keyType, $key, $keyIsFile, $passphrase);
+                return new RsaOaepMgf1p($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_SHA1:
-                return new \ass\XmlSecurity\Key\RsaSha1($keyType, $key, $keyIsFile, $passphrase);
+                return new RsaSha1($keyType, $key, $keyIsFile, $passphrase);
                 break;
             case self::RSA_SHA256:
-                return new \ass\XmlSecurity\Key\RsaSha256($keyType, $key, $keyIsFile, $passphrase);
+                return new RsaSha256($keyType, $key, $keyIsFile, $passphrase);
+                break;
+            case self::RSA_SHA384:
+                return new RsaSha384($keyType, $key, $keyIsFile, $passphrase);
+                break;
+            case self::RSA_SHA512:
+                return new RsaSha512($keyType, $key, $keyIsFile, $passphrase);
                 break;
             default:
                 throw new InvalidArgumentException('encryptionType', 'Invalid encryption type given');

@@ -1,8 +1,10 @@
+# XmlSecurity Library [![Build Status](https://secure.travis-ci.org/aschamberger/XmlSecurity.png?branch=master)](http://travis-ci.org/aschamberger/XmlSecurity)
+
 The XmlSecurity library is written in PHP for working with XML Encryption and
 Signatures.
 
-Installation:
-=============
+#Installation:
+
 You can install the library with [`composer.phar`][1]. Create a `composer.json` file:
 
 ```json
@@ -18,8 +20,7 @@ Now you are ready to install the library:
 $ curl -sS https://getcomposer.org/installer | php && php composer.phar install
 ```
 
-Origin:
-=======
+# Origin:
 
 Large portions of the library are derived from the [xmlseclibs PHP library for
 XML Security][2]. Copyright (c) 2007-2010, Robert Richards

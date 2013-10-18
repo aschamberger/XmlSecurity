@@ -43,6 +43,9 @@
 
 namespace ass\XmlSecurity\Key;
 
+use ass\XmlSecurity\Pem;
+use ass\XmlSecurity\Key;
+
 use ass\XmlSecurity\Exception\DecryptionException;
 use ass\XmlSecurity\Exception\EncryptionException;
 use ass\XmlSecurity\Exception\InvalidSignatureException;
@@ -55,7 +58,7 @@ use ass\XmlSecurity\Exception\SignatureErrorException;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-abstract class Openssl extends \ass\XmlSecurity\Key
+abstract class Openssl extends Key
 {
     /**
      * Openssl digest.
@@ -194,7 +197,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
             return null;
         }
         if ($singleLineString === true) {
-            $certs = \ass\XmlSecurity\Pem::parseKeyFromPemFormat($this->key, \ass\XmlSecurity\Pem::PEM_TYPE_CERTIFICATE_X509);
+            $certs = Pem::parseKeyFromPemFormat($this->key, Pem::PEM_TYPE_CERTIFICATE_X509);
 
             return (isset($certs[0])) ? $certs[0] : null;
         }
@@ -235,7 +238,7 @@ abstract class Openssl extends \ass\XmlSecurity\Key
         if ($this->keyType != self::TYPE_PUBLIC) {
             return null;
         }
-        $certs = \ass\XmlSecurity\Pem::parseKeyFromPemFormat($this->key, \ass\XmlSecurity\Pem::PEM_TYPE_CERTIFICATE_X509);
+        $certs = Pem::parseKeyFromPemFormat($this->key, Pem::PEM_TYPE_CERTIFICATE_X509);
 
         return strtolower(sha1(base64_decode($certs[0])));
     }
