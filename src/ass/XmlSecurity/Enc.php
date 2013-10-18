@@ -386,14 +386,15 @@ class Enc
 
                         return Key::factory($algorithm, $keyString, false, Key::TYPE_PRIVATE);
                     } else {
-                        $keyResolver = function(DOMElement $node, $algorithm) use ($key) {
-                            if (self::RETRIEVAL_METHOD_ENCRYPTED_KEY == $node->getAttribute('Type')) {
+                        $class = __CLASS__;
+                        $keyResolver = function(DOMElement $node, $algorithm) use ($class, $key) {
+                            if ($class::RETRIEVAL_METHOD_ENCRYPTED_KEY == $node->getAttribute('Type')) {
                                 $uri = $node->getAttribute('URI');
-                                $referencedNode = self::getReferenceNodeForUri($node, $uri);
+                                $referencedNode = $class::getReferenceNodeForUri($node, $uri);
 
-                                if (null !== $referencedNode && self::NS_XMLENC == $referencedNode->namespaceURI
+                                if (null !== $referencedNode && $class::NS_XMLENC == $referencedNode->namespaceURI
                                         && 'EncryptedKey' == $referencedNode->localName) {
-                                    $keyString = self::decryptEncryptedKey($referencedNode, $key);
+                                    $keyString = $class::decryptEncryptedKey($referencedNode, $key);
 
                                     return Key::factory($algorithm, $keyString, false, Key::TYPE_PRIVATE);
                                 }
