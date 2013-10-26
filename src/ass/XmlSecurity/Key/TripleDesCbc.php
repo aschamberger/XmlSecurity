@@ -50,7 +50,7 @@ namespace ass\XmlSecurity\Key;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-class TripleDesCbc extends Mcrypt
+class TripleDesCbc extends OpensslBlock
 {
     /**
      * Constructor.
@@ -59,9 +59,9 @@ class TripleDesCbc extends Mcrypt
      */
     public function __construct($key = null)
     {
-        $this->cipher = MCRYPT_TRIPLEDES;
-        $this->mode   = MCRYPT_MODE_CBC;
-        $this->type   = self::TRIPLEDES_CBC;
+        $this->cipherMethod = 'des-ede3-cbc';
+        $this->keySize      = 24;
+        $this->type         = self::TRIPLEDES_CBC;
         parent::__construct($key);
     }
 
@@ -75,7 +75,7 @@ class TripleDesCbc extends Mcrypt
         $key = parent::generateSessionKey();
         /*
          * Make sure that the generated key has the proper parity bits set.
-         * Mcrypt doesn't care about the parity bits, but others may care.
+         * Mcrypt/OpenSSL doesn't care about the parity bits, but others may care.
          */
         for ($i = 0; $i < strlen($key); $i++) {
             $byte = ord($key[$i]) & 0xfe;
