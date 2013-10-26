@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class Aes192Cbc extends Mcrypt
+class Aes192Cbc extends OpensslBlock
 {
     /**
      * Constructor.
@@ -58,9 +58,9 @@ class Aes192Cbc extends Mcrypt
      */
     public function __construct($key = null)
     {
-        $this->cipher = MCRYPT_RIJNDAEL_128;
-        $this->mode   = MCRYPT_MODE_CBC;
-        $this->type   = self::AES192_CBC;
+        $this->cipherMethod = 'aes-192-cbc';
+        $this->keySize      = 24;
+        $this->type         = self::AES192_CBC;
         parent::__construct($key);
     }
 }
