@@ -20,6 +20,9 @@
         "ext-openssl": "*",
         "lib-openssl": ">=0.9.0"
     },
+    "suggest": {
+        "ext-mcrypt": ""
+    },
     "autoload": {
        "psr-0": { "ass\\XmlSecurity": "src/" }
     },
