@@ -50,7 +50,7 @@ namespace ass\XmlSecurity\Key;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-class TripleDesCbc extends OpensslBlock
+class TripleDesCbc extends Block
 {
     /**
      * Constructor.

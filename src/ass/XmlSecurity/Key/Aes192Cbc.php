@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class Aes192Cbc extends OpensslBlock
+class Aes192Cbc extends Block
 {
     /**
      * Constructor.

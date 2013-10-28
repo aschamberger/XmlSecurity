@@ -55,7 +55,7 @@ use ass\XmlSecurity\Exception\EncryptionException;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-abstract class OpensslBlock extends Key
+abstract class Block extends Key
 {
     /**
      * Cipher method.
@@ -103,10 +103,46 @@ abstract class OpensslBlock extends Key
         $data = substr($data, $ivLength);
         // hide warnings with @ operator as we throw exception
         if (false === ($decryptedData = @openssl_decrypt($data, $this->cipherMethod, $this->key, OPENSSL_RAW_DATA, $iv))) {
-            throw new DecryptionException($this->type, $this->getOpenSslErrorString());
+            // openssl checks PKCS#5 padding in decryption and fails if other padding detected
+            // try decryption without padding and try to remove padding by ourselves
+            if (version_compare(PHP_VERSION, '5.4.0-dev', '>=')) {
+                if (false === ($decryptedData = @openssl_decrypt(base64_encode($data), $this->cipherMethod, $this->key, OPENSSL_ZERO_PADDING, $iv))) {
+                    throw new DecryptionException($this->type, $this->getOpenSslErrorString());
+                } else {
+                    $decryptedData = $this->pkcsUnpad($decryptedData);
+                }
+            // for PHP 5.3 fall back to mcrypt if available
+            } elseif (function_exists('mcrypt_decrypt')) {
+                if ($this->cipherMethod == 'des-ede3-cbc') {
+                    $mcryptCipherMethod = MCRYPT_TRIPLEDES;
+                } else {
+                    $mcryptCipherMethod = MCRYPT_RIJNDAEL_128;
+                }
+                $decryptedData = mcrypt_decrypt($mcryptCipherMethod, $this->key, $data, MCRYPT_MODE_CBC, $iv);
+                $decryptedData = $this->pkcsUnpad($decryptedData);
+            } else {
+                throw new DecryptionException($this->type, $this->getOpenSslErrorString());
+            }
         }
 
         return $decryptedData;
+    }
+
+    /**
+     * Remove PKCS padding and only check last byte for padding length.
+     *
+     * adapted from
+     * http://us3.php.net/manual/en/function.mcrypt-encrypt.php#102428
+     *
+     * @param string $string String where PKCS padding should be removed
+     *
+     * @return string
+     */
+    protected function pkcsUnpad($string)
+    {
+        $pad = ord(substr($string, -1));
+
+        return substr($string, 0, -1 * $pad);
     }
 
     /**

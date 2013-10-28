@@ -2,6 +2,8 @@
 
 namespace ass\XmlSecurity\Tests;
 
+use ass\XmlSecurity\Key\TripleDesCbc;
+
 use ass\XmlSecurity\Key;
 
 class KeyTest extends \PHPUnit_Framework_TestCase
@@ -54,6 +56,25 @@ class KeyTest extends \PHPUnit_Framework_TestCase
 
                 $this->assertEquals(1, $parity, "Check that generated triple-des keys have the correct parity.");
             }
+        }
+    }
+
+    public function testTripleDesAxisDecryption()
+    {
+        $files = array(
+            'cipher_one.txt' => 'key_one.txt',
+            'cipher_two.txt' => 'key_two.txt',
+        );
+        $expected = file_get_contents($this->fixturesDir.'/Key/result.txt');
+
+        foreach ($files as $cipher => $key) {
+            $key = file_get_contents($this->fixturesDir.'/Key/'.$key);
+            $tripleDes = new TripleDesCbc($key);
+            $data = file_get_contents($this->fixturesDir.'/Key/'.$cipher);
+            $result = $tripleDes->decryptData($data);
+
+            $this->assertEquals($expected, $result, "Check that 3des cbc encrypted cipher is properly decrypted.");
+
         }
     }
 }

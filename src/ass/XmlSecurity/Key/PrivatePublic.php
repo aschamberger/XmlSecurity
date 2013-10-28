@@ -58,7 +58,7 @@ use ass\XmlSecurity\Exception\SignatureErrorException;
  * @author Andreas Schamberger <mail@andreass.net>
  * @author Robert Richards <rrichards@cdatazone.org>
  */
-abstract class Openssl extends Key
+abstract class PrivatePublic extends Key
 {
     /**
      * Openssl digest.

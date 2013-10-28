@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class RsaOaepMgf1p extends Openssl
+class RsaOaepMgf1p extends PrivatePublic
 {
     /**
      * Loads the given cryptographic key for the class.

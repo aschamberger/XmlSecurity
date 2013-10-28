@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class RsaSha384 extends Openssl
+class RsaSha384 extends PrivatePublic
 {
     /**
      * Loads the given cryptographic key for the class.

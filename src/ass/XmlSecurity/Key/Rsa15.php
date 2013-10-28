@@ -49,7 +49,7 @@ namespace ass\XmlSecurity\Key;
  *
  * @author Andreas Schamberger <mail@andreass.net>
  */
-class Rsa15 extends Openssl
+class Rsa15 extends PrivatePublic
 {
     /**
      * Loads the given cryptographic key for the class.
