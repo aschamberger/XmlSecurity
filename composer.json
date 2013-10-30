@@ -26,6 +26,11 @@
     "autoload": {
        "psr-0": { "ass\\XmlSecurity": "src/" }
     },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
+    },
     "support": {
         "issues": "https://github.com/aschamberger/XmlSecurity/issues",
         "source": "https://github.com/aschamberger/XmlSecurity"
