@@ -81,7 +81,12 @@ class DSig
     /**
      * Message Digest algorithm SHA256
      */
-    const SHA256 = 'http://www.w3.org/2001/04/xmldsig-more#sha256';
+    const SHA256 = 'http://www.w3.org/2001/04/xmlenc#sha256';
+
+    /**
+     * Message Digest algorithm SHA256
+     */
+    const SHA256_DSIG = 'http://www.w3.org/2001/04/xmldsig-more#sha256';
 
     /**
      * Message Digest algorithm SHA384
@@ -286,10 +291,11 @@ class DSig
                 $algorithm = 'sha1';
                 break;
             case self::SHA256:
+            case self::SHA256_DSIG:
                 $algorithm = 'sha256';
                 break;
             case self::SHA384:
-                $algorithm = 'sha512';
+                $algorithm = 'sha384';
                 break;
             case self::SHA512:
                 $algorithm = 'sha512';
