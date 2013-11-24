@@ -487,32 +487,35 @@ class DSig
     /**
      * Create a ds:KeyInfo with RSA key vlue from given Key object
      *
-     * @param \DOMDocument         $doc  DOMDocument to add the KeyInfo
-     * @param \ass\XmlSecurity\Key $rsa Key
+     * @param \DOMDocument         $doc DOMDocument to add the KeyInfo
+     * @param \ass\XmlSecurity\Key $key Key
      *
      * @return DOMElement
      */
-    public static function createRSAKeyInfo(DOMDocument $doc, Key $rsa)
+    public static function createRSAKeyInfo(DOMDocument $doc, Key $key)
     {
-        $key_details = $rsa->getDetails();
-    
-        $rsa = $key_details['rsa'];
-        $modulus = $rsa['n'];
-        $exponent = $rsa['e'];
+        $keyDetails = $key->getDetails();
+
+        if (OPENSSL_KEYTYPE_RSA != $keyDetails['type']) {
+            throw InvalidArgumentException('key', 'Key type must be RSA.');
+        }
+
+        if (!isset($keyDetails['rsa']['n']) && !isset($keyDetails['rsa']['e'])) {
+            throw InvalidArgumentException('key', 'RSA key details must contain modulus and public exponent.');
+        }
 
         $keyInfo = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':KeyInfo');
         $rsaKeyValue = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':RSAKeyValue');
         $keyInfo->appendChild($rsaKeyValue);
-    
-        if (isset($modulus)) {
-            $eModulus = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':Modulus', base64_encode($modulus));
-            $rsaKeyValue->appendChild($eModulus);
-        }
-        if (isset($exponent)) {
-            $eExponent = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':Exponent', base64_encode($exponent));
-            $rsaKeyValue->appendChild($eExponent);
-        }
-    
+
+        $modulusBase64 = base64_encode($keyDetails['rsa']['n']);
+        $modulus = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':Modulus', $modulusBase64);
+        $rsaKeyValue->appendChild($modulus);
+
+        $exponentBase64 = base64_encode($keyDetails['rsa']['e']);
+        $exponent = $doc->createElementNS(DSig::NS_XMLDSIG, DSig::PFX_XMLDSIG.':Exponent', $exponentBase64);
+        $rsaKeyValue->appendChild($exponent);
+
         return $keyInfo;
     }
 
