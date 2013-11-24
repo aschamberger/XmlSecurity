@@ -206,6 +206,17 @@ abstract class PrivatePublic extends Key
     }
 
     /**
+     * Retrieve the key details.
+     *
+     * @return string|null
+     */
+    public function getDetails()
+    {
+        return openssl_pkey_get_details($this->opensslResource);
+    }
+	
+
+    /**
      * Gets the X509 subject key identifier for this certificate.
      *
      * @return string|null
