@@ -765,7 +765,7 @@ class DSig
      *
      * @return array(DOMElement)
      */
-    public static function getReferenceNodes(DOMElement $signature, array $options)
+    public static function getReferenceNodes(DOMElement $signature, array $options = array())
     {
         if ($signature instanceof DOMDocument) {
             $doc = $signature;
