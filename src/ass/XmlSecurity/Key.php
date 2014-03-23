@@ -176,10 +176,10 @@ abstract class Key
      * @param string  $encryptionType Encryption algorithm
      * @param string  $key            Key string
      * @param boolean $keyIsFile      Key parameter is file name
-     * @param string  $keyType        \ass\XmlSecurity\Key::TYPE_PUBLIC | \ass\XmlSecurity\Key::TYPE_PRIVATE
+     * @param string  $keyType        Key::TYPE_PUBLIC | Key::TYPE_PRIVATE
      * @param string  $passphrase     Passphrase for key
      *
-     * @return \ass\XmlSecurity\Key
+     * @return Key
      */
     public static function factory($encryptionType, $key = null, $keyIsFile = true, $keyType = null, $passphrase = null)
     {

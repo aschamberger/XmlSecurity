@@ -193,13 +193,13 @@ class DSig
      * );
      * </code>
      *
-     * @param \DOMElement $signature               Signature element
-     * @param \DOMNode    $node                    Node to add to signature
-     * @param string      $digestAlgorithm         Digest algorithm
-     * @param string      $transformationAlgorithm Transformation algorithm
-     * @param array       $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces, force_uri)
+     * @param DOMElement $signature               Signature element
+     * @param DOMNode    $node                    Node to add to signature
+     * @param string     $digestAlgorithm         Digest algorithm
+     * @param string     $transformationAlgorithm Transformation algorithm
+     * @param array      $options                 Options (id_name, id_ns_prefix, id_prefix_ns, overwrite_id, xpath_transformation, inclusive_namespaces, force_uri)
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function addNodeToSignature(DOMElement $signature, DOMNode $node, $digestAlgorithm, $transformationAlgorithm, array $options = array())
     {
@@ -313,10 +313,10 @@ class DSig
     /**
      * Cananicalizes the given node with the desired algorithm.
      *
-     * @param \DOMNode $node                      DOMNode to canonicalize
-     * @param string   $canonicalizationAlgorithm Canonicalization algorithm
-     * @param array    $xpath                     XPATH
-     * @param array    $nsPrefixes                Namespace prefixes
+     * @param DOMNode $node                      DOMNode to canonicalize
+     * @param string  $canonicalizationAlgorithm Canonicalization algorithm
+     * @param array   $xpath                     XPATH
+     * @param array   $nsPrefixes                Namespace prefixes
      *
      * @return string
      */
@@ -372,13 +372,13 @@ class DSig
     /**
      * Creates a new Signature node and appends it to the given node.
      *
-     * @param \ass\XmlSecurity\Key $keyForSignature           Key to sign
-     * @param string               $canonicalizationAlgorithm Canonicalization algorithm
-     * @param \DOMNode             $appendTo                  Append signature node to this node
-     * @param \DOMNode             $insertBefore              Insert signature node before the given node
-     * @param \DOMElement          $keyInfo                   KeyInfo element
+     * @param Key        $keyForSignature           Key to sign
+     * @param string     $canonicalizationAlgorithm Canonicalization algorithm
+     * @param DOMNode    $appendTo                  Append signature node to this node
+     * @param DOMNode    $insertBefore              Insert signature node before the given node
+     * @param DOMElement $keyInfo                   KeyInfo element
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function createSignature(Key $keyForSignature, $canonicalizationAlgorithm, DOMNode $appendTo, DOMNode $insertBefore = null, DOMElement $keyInfo = null)
     {
@@ -445,9 +445,9 @@ class DSig
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $signature Signature element
+     * @param DOMElement $signature Signature element
      *
-     * @return \ass\XmlSecurity\Key|null
+     * @return Key|null
      */
     public static function getSecurityKey(DOMElement $signature)
     {
@@ -466,8 +466,8 @@ class DSig
     /**
      * Create a ds:KeyInfo with X509 certificate from given Key object
      *
-     * @param \DOMDocument         $doc  DOMDocument to add the KeyInfo
-     * @param \ass\XmlSecurity\Key $cert Key containing certificate
+     * @param DOMDocument $doc  DOMDocument to add the KeyInfo
+     * @param Key         $cert Key containing certificate
      *
      * @return DOMElement
      */
@@ -487,8 +487,8 @@ class DSig
     /**
      * Create a ds:KeyInfo with RSA key vlue from given Key object
      *
-     * @param \DOMDocument         $doc DOMDocument to add the KeyInfo
-     * @param \ass\XmlSecurity\Key $key Key
+     * @param DOMDocument $doc DOMDocument to add the KeyInfo
+     * @param Key         $key Key
      *
      * @return DOMElement
      */
@@ -528,10 +528,10 @@ class DSig
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement $keyInfo   KeyInfo element
-     * @param string      $algorithm Key algorithm
+     * @param DOMElement $keyInfo   KeyInfo element
+     * @param string     $algorithm Key algorithm
      *
-     * @return \ass\XmlSecurity\Key|null
+     * @return Key|null
      */
     public static function getSecurityKeyFromKeyInfo(DOMElement $keyInfo, $algorithm)
     {
@@ -553,12 +553,12 @@ class DSig
     }
 
     /**
-     * Tries to resolve a key from the given \DOMElement.
+     * Tries to resolve a key from the given DOMElement.
      *
-     * @param \DOMElement $node      KeyInfo element
-     * @param string      $algorithm Key algorithm
+     * @param DOMElement $node      KeyInfo element
+     * @param string     $algorithm Key algorithm
      *
-     * @return \ass\XmlSecurity\Key|null
+     * @return Key|null
      * @throws MissingMandatoryParametersException
      */
     private static function keyInfoKeyValueResolver(DOMElement $node, $algorithm)
@@ -606,12 +606,12 @@ class DSig
     }
 
     /**
-     * Tries to resolve a key from the given \DOMElement.
+     * Tries to resolve a key from the given DOMElement.
      *
-     * @param \DOMElement $node      KeyInfo element
-     * @param string      $algorithm Key algorithm
+     * @param DOMElement $node      KeyInfo element
+     * @param string     $algorithm Key algorithm
      *
-     * @return \ass\XmlSecurity\Key|null
+     * @return Key|null
      */
     private static function keyInfoX509DataResolver(DOMElement $node, $algorithm)
     {
@@ -626,11 +626,11 @@ class DSig
     }
 
     /**
-     * Locates the 'ds:Signature' within the given \DOMDocument or \DOMNode.
+     * Locates the 'ds:Signature' within the given DOMDocument or DOMNode.
      *
-     * @param \DOMNode $node Node within the signature should be located
+     * @param DOMNode $node Node within the signature should be located
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function locateSignature(DOMNode $node)
     {
@@ -655,7 +655,7 @@ class DSig
     /**
      * Process transformation.
      *
-     * @param \DOMNode             $node                    Not to transform
+     * @param DOMNode              $node                    Not to transform
      * @param string               $transformationAlgorithm Transformation algorithm
      * @param array(string=>mixed) $options                 Options (xpath_transformation, inclusive_namespaces)
      *
@@ -704,11 +704,11 @@ class DSig
     /**
      * Sign the document.
      *
-     * @param \DOMElement          $signature                 Signature element to sign
-     * @param \ass\XmlSecurity\Key $keyForSignature           Key used to sign data
-     * @param string               $canonicalizationAlgorithm Canonicalization algorithm
+     * @param DOMElement $signature                 Signature element to sign
+     * @param Key        $keyForSignature           Key used to sign data
+     * @param string     $canonicalizationAlgorithm Canonicalization algorithm
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function signDocument(DOMElement $signature, Key $keyForSignature, $canonicalizationAlgorithm)
     {
@@ -728,8 +728,8 @@ class DSig
     /**
      * Verify the document's signature.
      *
-     * @param \DOMElement          $signature       Signature element to verify
-     * @param \ass\XmlSecurity\Key $keyForSignature Key to validate signature
+     * @param DOMElement $signature       Signature element to verify
+     * @param Key        $keyForSignature Key to validate signature
      *
      * @return boolean
      */
@@ -758,14 +758,14 @@ class DSig
     }
 
     /**
-     * Verify the document's signature.
+     * Get list of reference nodes.
      *
-     * @param \DOMElement $signature Signature element
-     * @param array       $options   Options (xpath_transformation, inclusive_namespaces)
+     * @param DOMElement $signature Signature element
+     * @param array      $options   Options (xpath_transformation, inclusive_namespaces)
      *
-     * @return boolean
+     * @return array(DOMElement)
      */
-    public static function verifyReferences(DOMElement $signature, array $options = array())
+    public static function getReferenceNodes(DOMElement $signature, array $options)
     {
         if ($signature instanceof DOMDocument) {
             $doc = $signature;
@@ -784,71 +784,117 @@ class DSig
             $idNamespace = $options['id_prefix_ns'];
             $xpath->registerNamespace($options['id_ns_prefix'], $options['id_prefix_ns']);
         }
-        $nodes = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'Reference');
-        if ($nodes->length > 0) {
-            $allValid = true;
-            foreach ($nodes as $reference) {
-                $isValid = false;
-                $uri = $reference->getAttribute('URI');
-                if ($uri !== null && $uri !== '') {
-                    $url = parse_url($uri);
-                    $referenceId = $url['fragment'];
-                    // get referenced node
-                    if (!is_null($idNamespace)) {
-                        $query = '//*[@' . $idName . '="' . $referenceId . '" or @Id="' . $referenceId . '"]';
+
+        $referenceNodes = array();
+
+        $signedInfo = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignedInfo')->item(0);
+        if (!is_null($signedInfo)) {
+            $nodes = $signedInfo->getElementsByTagNameNS(self::NS_XMLDSIG, 'Reference');
+            if ($nodes->length > 0) {
+                foreach ($nodes as $reference) {
+                    $uri = $reference->getAttribute('URI');
+                    if ($uri !== null && $uri !== '') {
+                        $url = parse_url($uri);
+                        $referenceId = $url['fragment'];
+                        // get referenced node
+                        if (!is_null($idNamespace)) {
+                            $query = '//*[@' . $idName . '="' . $referenceId . '" or @Id="' . $referenceId . '"]';
+                        } else {
+                            $query = '//*[@' . $idName . '="' . $referenceId . '"]';
+                        }
+                        $node = $xpath->query($query)->item(0);
                     } else {
-                        $query = '//*[@' . $idName . '="' . $referenceId . '"]';
+                        $node = $doc;
                     }
-                    $node = $xpath->query($query)->item(0);
-                } else {
-                    $node = $doc;
+
+                    $referenceNodes[] = array(
+                        'ref'  => $reference,
+                        'node' => $node,
+                    );
                 }
+            }
+        }
 
-                // get tranformation method and canonicalize data
-                $transform = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transform')->item(0);
-                if (!is_null($transform)) {
-                    $transformationAlgorithm = $transform->getAttribute('Algorithm');
-                    $options = array();
+        return $referenceNodes;
+    }
 
-                    switch ($transformationAlgorithm) {
-                        case self::XPATH:
-                            $xpath = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
-                            if (!is_null($xpath)) {
-                                $options['xpath_transformation']['query'] = $xpath->nodeValue;
-                                $options['xpath_transformation']['namespaces'] = array();
-                                $nslist = $xpath->query('./namespace::*', $node);
-                                foreach ($nslist as $nsnode) {
-                                    if ($nsnode->localName != 'xml') {
-                                        $options['xpath_transformation']['namespaces'][$nsnode->localName] = $nsnode->nodeValue;
-                                    }
-                                }
-                            }
-                            break;
-                        case self::EXC_C14N:
-                            $inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
-                            if (!is_null($inclusiveNamespaces)) {
-                                $prefixList = $transform->getAttribute('PrefixList');
-                                $nsPrefixes = explode(' ', $prefixList);
-                                if (count($nsPrefixes) > 0) {
-                                    $options['inclusive_namespaces'] = $nsPrefixes;
-                                }
-                            }
-                            break;
-                    }
+    /**
+     * Verify the given node.
+     *
+     * @param DOMElement $reference Reference node element to be verified
+     * @param DOMNode    $node      Node element to be verified
+     *
+     * @return boolean
+     */
+    private static function verifyReference(DOMElement $reference, DOMNode $node)
+    {
+        $isValid = false;
 
-                    $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
-                    $digestMethod = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestMethod')->item(0);
-                    if (!is_null($digestMethod)) {
-                        $digestAlgorithm = $digestMethod->getAttribute('Algorithm');
-                        $digestValueString = self::calculateDigest($transformedData, $digestAlgorithm);
-                        $digestValue = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestValue')->item(0);
-                        if (!is_null($digestValue)) {
-                            if ($digestValueString == $digestValue->textContent) {
-                                $isValid = true;
+        // get tranformation method and canonicalize data
+        $transform = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transform')->item(0);
+        if (!is_null($transform)) {
+            $transformationAlgorithm = $transform->getAttribute('Algorithm');
+            $options = array();
+
+            switch ($transformationAlgorithm) {
+                case self::XPATH:
+                    $xpathNode = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
+                    if (!is_null($xpathNode)) {
+                        $options['xpath_transformation']['query'] = $xpathNode->nodeValue;
+                        $options['xpath_transformation']['namespaces'] = array();
+                        $xpath = new DOMXPath($reference->ownerDocument);
+                        $nslist = $xpath->query('./namespace::*', $xpathNode);
+                        foreach ($nslist as $nsnode) {
+                            if ($nsnode->localName != 'xml') {
+                                $options['xpath_transformation']['namespaces'][$nsnode->localName] = $nsnode->nodeValue;
                             }
                         }
                     }
+                    break;
+                case self::EXC_C14N:
+                    $inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
+                    if (!is_null($inclusiveNamespaces)) {
+                        $prefixList = $transform->getAttribute('PrefixList');
+                        $nsPrefixes = explode(' ', $prefixList);
+                        if (count($nsPrefixes) > 0) {
+                            $options['inclusive_namespaces'] = $nsPrefixes;
+                        }
+                    }
+                    break;
+            }
+
+            $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
+            $digestMethod = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestMethod')->item(0);
+            if (!is_null($digestMethod)) {
+                $digestAlgorithm = $digestMethod->getAttribute('Algorithm');
+                $digestValueString = self::calculateDigest($transformedData, $digestAlgorithm);
+                $digestValue = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestValue')->item(0);
+                if (!is_null($digestValue)) {
+                    if ($digestValueString == $digestValue->textContent) {
+                        $isValid = true;
+                    }
                 }
+            }
+        }
+
+        return $isValid;
+    }
+
+    /**
+     * Verify the document's signature.
+     *
+     * @param DOMElement $signature Signature element
+     * @param array      $options   Options (xpath_transformation, inclusive_namespaces)
+     *
+     * @return boolean
+     */
+    public static function verifyReferences(DOMElement $signature, array $options = array())
+    {
+        $referenceNodes = self::getReferenceNodes($signature, $options);
+        if (count($referenceNodes) > 0) {
+            $allValid = true;
+            foreach ($referenceNodes as $referenceNode) {
+                $isValid = self::verifyReference($referenceNode['ref'], $referenceNode['node']);
                 $allValid = ($allValid === false) ? false : $isValid;
             }
 

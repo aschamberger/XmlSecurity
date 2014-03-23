@@ -118,14 +118,14 @@ class Enc
     /**
      * Creates a new EncryptedKey node and appends it to the given node.
      *
-     * @param string               $guid             Unique id/if null wrap in ds:KeyInfo
-     * @param \ass\XmlSecurity\Key $keyToBeEncrypted Key that should be encrypted
-     * @param \ass\XmlSecurity\Key $keyForEncryption Key to use for encryption
-     * @param \DOMNode             $appendTo         Node where encrypted key should be appended
-     * @param \DOMNode             $insertBefore     Encrypted key should be inserted before this node
-     * @param \DOMElement          $keyInfo          KeyInfo element
+     * @param string     $guid             Unique id/if null wrap in ds:KeyInfo
+     * @param Key        $keyToBeEncrypted Key that should be encrypted
+     * @param Key        $keyForEncryption Key to use for encryption
+     * @param DOMNode    $appendTo         Node where encrypted key should be appended
+     * @param DOMNode    $insertBefore     Encrypted key should be inserted before this node
+     * @param DOMElement $keyInfo          KeyInfo element
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function createEncryptedKey($guid, Key $keyToBeEncrypted, Key $keyForEncryption, DOMNode $appendTo, DOMNode $insertBefore = null, DOMElement $keyInfo = null)
     {
@@ -173,9 +173,9 @@ class Enc
     /**
      * Creates a new ReferenceList Node and appends it to the given node.
      *
-     * @param \DOMElement $appendTo Appent the reference list to this node
+     * @param DOMElement $appendTo Appent the reference list to this node
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function createReferenceList(DOMElement $appendTo)
     {
@@ -191,8 +191,8 @@ class Enc
      *
      * Uses either the given key or resolves the KeyInfo data.
      *
-     * @param \DOMElement          $encryptedKey Encrypted key element
-     * @param \ass\XmlSecurity\Key $keyToDecrypt Key used for decryption
+     * @param DOMElement $encryptedKey Encrypted key element
+     * @param Key        $keyToDecrypt Key used for decryption
      *
      * @return string|null
      */
@@ -218,10 +218,10 @@ class Enc
      *
      * Uses either the given key or resolves the KeyInfo data.
      *
-     * @param \DOMNode             $node Node to decrypt
-     * @param \ass\XmlSecurity\Key $key  Key to use for decryption
+     * @param DOMNode $node Node to decrypt
+     * @param Key     $key  Key to use for decryption
      *
-     * @return \DOMNode|null
+     * @return DOMNode|null
      */
     public static function decryptNode(DOMNode $node, $key = null)
     {
@@ -277,13 +277,13 @@ class Enc
     /**
      * Encryptes the given node and adds it to the list of references.
      *
-     * @param \DOMNode             $node          DOM node to encrypt
-     * @param string               $type          \ass\XmlSecurity\Enc::ELEMENT || \ass\XmlSecurity\Enc::CONTENT
-     * @param \ass\XmlSecurity\Key $key           Security key to use for encryption
-     * @param \DOMElement          $referenceList Reference list element
-     * @param \DOMElement          $keyInfo       KeyInfo element
+     * @param DOMNode    $node          DOM node to encrypt
+     * @param string     $type          \ass\XmlSecurity\Enc::ELEMENT || \ass\XmlSecurity\Enc::CONTENT
+     * @param Key        $key           Security key to use for encryption
+     * @param DOMElement $referenceList Reference list element
+     * @param DOMElement $keyInfo       KeyInfo element
      *
-     * @return \DOMNode
+     * @return DOMNode
      */
     public static function encryptNode(DOMNode $node, $type, Key $key, DOMElement $referenceList = null, $keyInfo = null)
     {
@@ -367,10 +367,10 @@ class Enc
      * $keyResolver = array('MyClass' => 'function');
      * \ass\XmlSecurity\DSig::addKeyInfoResolver($ns, $localName, $keyResolver);
      *
-     * @param \DOMElement          $encryptedData Encrypted data element
-     * @param \ass\XmlSecurity\Key $key           Key to decrypt EncryptedKey
+     * @param DOMElement $encryptedData Encrypted data element
+     * @param Key        $key           Key to decrypt EncryptedKey
      *
-     * @return \ass\XmlSecurity\Key|null
+     * @return Key|null
      */
     public static function getSecurityKey(DOMElement $encryptedData, Key $key = null)
     {
@@ -416,10 +416,10 @@ class Enc
     /**
      * Locates EncryptedData elements within the given node or referenceList.
      *
-     * @param \DOMNode    $node          Node where encrypted data should be located
-     * @param \DOMElement $referenceList Reference list element
+     * @param DOMNode    $node          Node where encrypted data should be located
+     * @param DOMElement $referenceList Reference list element
      *
-     * @return \DOMNodeList
+     * @return DOMNodeList
      */
     public static function locateEncryptedData(DOMNode $node, DOMElement $referenceList = null)
     {
@@ -452,11 +452,11 @@ class Enc
     }
 
     /**
-     * Locates the 'xenc:EncryptedKey' within the given \DOMDocument or \DOMNode.
+     * Locates the 'xenc:EncryptedKey' within the given \DOMDocument or DOMNode.
      *
-     * @param \DOMNode $node Node where encrypted key should be located
+     * @param DOMNode $node Node where encrypted key should be located
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function locateEncryptedKey(DOMNode $node)
     {
@@ -479,9 +479,9 @@ class Enc
     }
 
     /**
-     * Locates the 'xenc:ReferenceList' within the given \DOMDocument or \DOMNode.
+     * Locates the 'xenc:ReferenceList' within the given \DOMDocument or DOMNode.
      *
-     * @param \DOMNode $node Node where reference list should be located
+     * @param DOMNode $node Node where reference list should be located
      *
      * @return DOMElement
      */
@@ -508,10 +508,10 @@ class Enc
     /**
      * Gets the referenced node for the given URI.
      *
-     * @param \DOMElement $node Node
-     * @param string      $uri  URI
+     * @param DOMElement $node Node
+     * @param string     $uri  URI
      *
-     * @return \DOMElement
+     * @return DOMElement
      */
     public static function getReferenceNodeForUri(DOMElement $node, $uri)
     {
