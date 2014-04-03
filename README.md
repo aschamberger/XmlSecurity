@@ -1,4 +1,4 @@
-# XmlSecurity Library [![Build Status](https://secure.travis-ci.org/aschamberger/XmlSecurity.png?branch=master)](http://travis-ci.org/aschamberger/XmlSecurity)
+# XmlSecurity Library [![Build Status](https://secure.travis-ci.org/aschamberger/XmlSecurity.png?branch=master)](http://travis-ci.org/aschamberger/XmlSecurity) [![Coverage Status](https://coveralls.io/repos/aschamberger/XmlSecurity/badge.png?branch=master)](https://coveralls.io/r/aschamberger/XmlSecurity)
 
 The XmlSecurity library is written in PHP for working with XML Encryption and
 Signatures.
