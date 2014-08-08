@@ -582,7 +582,7 @@ class DSig
                         // calculate public key
                         $publicKey = Pem::getPublicKeyFromPqgy($parameters['P'], $parameters['Q'], $parameters['G'], $parameters['Y']);
 
-                        return Key::factory($algorithm, $publicKey, Key::TYPE_PUBLIC);
+                        return Key::factory($algorithm, $publicKey, false, Key::TYPE_PUBLIC);
                     case 'RSAKeyValue':
                         $parameters = array();
                         foreach ($key->childNodes as $parameter) {
@@ -597,7 +597,7 @@ class DSig
                         // calculate public key
                         $publicKey = Pem::getPublicKeyFromModExp($parameters['Modulus'], $parameters['Exponent']);
 
-                        return Key::factory($algorithm, $publicKey, Key::TYPE_PUBLIC);
+                        return Key::factory($algorithm, $publicKey, false, Key::TYPE_PUBLIC);
                 }
             }
         }
