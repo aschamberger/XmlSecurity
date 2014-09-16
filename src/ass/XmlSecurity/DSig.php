@@ -287,7 +287,7 @@ class DSig
      * @param string $algorithm
      * @param callable $handler
      */
-    public function addAdditionalDigestAlgorithm($algorithm, callable $handler)
+    public static function addAdditionalDigestAlgorithm($algorithm, callable $handler)
     {
         self::$additionalDigestAlgorithm[$algorithm] = $handler;
     }
