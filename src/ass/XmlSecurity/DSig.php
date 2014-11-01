@@ -136,6 +136,11 @@ class DSig
     const XPATH = 'http://www.w3.org/TR/1999/REC-xpath-19991116';
 
     /**
+     * @var callable[]
+     */
+    protected static $additionalDigestAlgorithm = array();
+
+    /**
      * List of KeyInfo resolvers that return the desired \ass\XmlSecurity\Key.
      *
      * @var array(string=>array(string=>callable))
@@ -277,6 +282,17 @@ class DSig
     }
 
     /**
+     * Add handler of additional digest algorithm.
+     *
+     * @param string $algorithm
+     * @param callable $handler
+     */
+    public static function addAdditionalDigestAlgorithm($algorithm, callable $handler)
+    {
+        self::$additionalDigestAlgorithm[$algorithm] = $handler;
+    }
+
+    /**
      * Calculates the digest of the given data with the desired algorithm.
      *
      * @param string $data            Data to calculate digest from
@@ -304,6 +320,9 @@ class DSig
                 $algorithm = 'ripemd160';
                 break;
             default:
+                if (isset(self::$additionalDigestAlgorithm[$digestAlgorithm])) {
+                    return call_user_func(self::$additionalDigestAlgorithm[$digestAlgorithm], $data);
+                }
                 throw new InvalidArgumentException('digestAlgorithm', "Invalid digest algorithm given: {$digestAlgorithm}");
         }
 
