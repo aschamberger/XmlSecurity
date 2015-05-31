@@ -51,6 +51,8 @@ use DOMXPath;
 
 use ass\XmlSecurity\Exception\InvalidArgumentException;
 use ass\XmlSecurity\Exception\MissingMandatoryParametersException;
+use ass\XmlSecurity\Exception\InvalidSignatureException;
+use ass\XmlSecurity\Exception\SignatureErrorException;
 
 /**
  * This class provides methods to digitally sign XML documents and implements
@@ -273,7 +275,7 @@ class DSig
         $digestMethod->setAttribute('Algorithm', $digestAlgorithm);
         $reference->appendChild($digestMethod);
 
-        $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
+        $transformedData = self::processTransforms($node, $transforms);
         $digestValueString = self::calculateDigest($transformedData, $digestAlgorithm);
         $digestValue = $doc->createElementNS(self::NS_XMLDSIG, self::PFX_XMLDSIG . ':DigestValue', $digestValueString);
         $reference->appendChild($digestValue);
@@ -672,52 +674,72 @@ class DSig
     }
 
     /**
-     * Process transformation.
+     * Process transforms.
      *
-     * @param DOMNode              $node                    Not to transform
-     * @param string               $transformationAlgorithm Transformation algorithm
-     * @param array(string=>mixed) $options                 Options (xpath_transformation, inclusive_namespaces)
+     * @param DOMNode $node       Not to transform
+     * @param DOMNode $transforms Transfors to be done
      *
      * @return string
      */
-    private static function processTransform(DOMNode $node, $transformationAlgorithm, array $options = array())
+    private static function processTransforms(DOMNode $node, DOMNode $transforms)
     {
-        switch ($transformationAlgorithm) {
-            case self::XPATH:
-                $xpath = null;
-                if (isset($options['xpath_transformation'])) {
-                    // http://xmlstar.sourceforge.net/doc/UG/ch04s06.html
-                    $xpath = array(
-                        'query' => '(.//. | .//@* | .//namespace::*)[' . $options['xpath_transformation']['query'] . ']',
-                        'namespaces' => $options['xpath_transformation']['namespaces'],
-                    );
-                }
+		$xpath = null;
+		$nsPrefixes = null;			
 
-                return self::canonicalizeData($node, self::C14N, $xpath);
-            case self::C14N:
-            case self::C14N_COMMENTS:
-                return self::canonicalizeData($node, $transformationAlgorithm);
-            case self::EXC_C14N:
-            case self::EXC_C14N_COMMENTS:
-                $nsPrefixes = null;
-                if (isset($options['inclusive_namespaces'])) {
-                    $nsPrefixes = $options['inclusive_namespaces'];
-                }
+		foreach ($transforms->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transform') as $transform) {
+            $transformationAlgorithm = $transform->getAttribute('Algorithm');
 
-                return self::canonicalizeData($node, $transformationAlgorithm, null, $nsPrefixes);
-            case self::TRANSFORMATION_ENVELOPED_SIGNATURE:
-                // http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
-                $xpath = array(
-                    'query' => sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG),
-                    'namespaces' => array(
-                        self::PFX_XMLDSIG => self::NS_XMLDSIG
-                    ),
-                );
+			switch ($transformationAlgorithm) {
+				case self::TRANSFORMATION_ENVELOPED_SIGNATURE:
+					$canonicalizationAlgorithm = self::EXC_C14N;
 
-                return self::canonicalizeData($node, self::EXC_C14N, $xpath);
-            default:
-                throw new InvalidArgumentException('transformationAlgorithm', "Invalid transformation algorithm given: {$transformationAlgorithm}");
-        }
+					// http://www.uberbrady.com/2008/10/horrifically-bad-technology.html
+					$xpath = array(
+						'query' => sprintf('(//. | //@* | //namespace::*)[not(ancestor-or-self::%s:Signature)]', self::PFX_XMLDSIG),
+						'namespaces' => array(
+							self::PFX_XMLDSIG => self::NS_XMLDSIG
+						),
+					);
+					break;
+				case self::XPATH:
+					$canonicalizationAlgorithm = self::C14N;
+				
+					$xpathNode = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
+					if (!is_null($xpathNode)) {
+						$query = $xpathNode->nodeValue;
+						$namespaces = array();
+						$xpath = new DOMXPath($reference->ownerDocument);
+						$nslist = $xpath->query('./namespace::*', $xpathNode);
+						foreach ($nslist as $nsnode) {
+							if ($nsnode->localName != 'xml') {
+								$namespaces[$nsnode->localName] = $nsnode->nodeValue;
+							}
+						}
+						// http://xmlstar.sourceforge.net/doc/UG/ch04s06.html
+						$xpath = array(
+							'query' => '(.//. | .//@* | .//namespace::*)[' . $query . ']',
+							'namespaces' => $namespaces,
+						);
+					}
+					break;
+				case self::C14N:
+				case self::C14N_COMMENTS:
+					$canonicalizationAlgorithm = $transformationAlgorithm;
+					break;
+				case self::EXC_C14N:
+				case self::EXC_C14N_COMMENTS:
+					$canonicalizationAlgorithm = $transformationAlgorithm;
+
+					$inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
+					if (!is_null($inclusiveNamespaces)) {
+						$prefixList = $inclusiveNamespaces->getAttribute('PrefixList');
+						$nsPrefixes = explode(' ', $prefixList);
+					}				
+
+			}		
+		}
+		
+		return self::canonicalizeData($node, $canonicalizationAlgorithm, $xpath, $nsPrefixes);
     }
 
     /**
@@ -765,10 +787,15 @@ class DSig
                 $canonicalizationAlgorithm = $canonicalizationMethod->getAttribute('Algorithm');
                 $signatureValue = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignatureValue')->item(0);
                 if (!is_null($signatureValue)) {
-                    $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm);
-                    $decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
-
-                    return $keyForSignature->verifySignature($canonicalizedData, $decodedSignatureValueFromSoapMessage);
+                    $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm);					
+					$decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
+					try {
+						return $keyForSignature->verifySignature($canonicalizedData, $decodedSignatureValueFromSoapMessage);
+					} catch (InvalidSignatureException $e) {
+						return false;
+					} catch (SignatureErrorException $e) {
+						return false;
+					}
                 }
             }
         }
@@ -849,40 +876,10 @@ class DSig
     {
         $isValid = false;
 
-        // get tranformation method and canonicalize data
-        $transform = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transform')->item(0);
-        if (!is_null($transform)) {
-            $transformationAlgorithm = $transform->getAttribute('Algorithm');
-            $options = array();
-
-            switch ($transformationAlgorithm) {
-                case self::XPATH:
-                    $xpathNode = $transform->getElementsByTagNameNS(self::NS_XMLDSIG, 'XPath')->item(0);
-                    if (!is_null($xpathNode)) {
-                        $options['xpath_transformation']['query'] = $xpathNode->nodeValue;
-                        $options['xpath_transformation']['namespaces'] = array();
-                        $xpath = new DOMXPath($reference->ownerDocument);
-                        $nslist = $xpath->query('./namespace::*', $xpathNode);
-                        foreach ($nslist as $nsnode) {
-                            if ($nsnode->localName != 'xml') {
-                                $options['xpath_transformation']['namespaces'][$nsnode->localName] = $nsnode->nodeValue;
-                            }
-                        }
-                    }
-                    break;
-                case self::EXC_C14N:
-                    $inclusiveNamespaces = $transform->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
-                    if (!is_null($inclusiveNamespaces)) {
-                        $prefixList = $transform->getAttribute('PrefixList');
-                        $nsPrefixes = explode(' ', $prefixList);
-                        if (count($nsPrefixes) > 0) {
-                            $options['inclusive_namespaces'] = $nsPrefixes;
-                        }
-                    }
-                    break;
-            }
-
-            $transformedData = self::processTransform($node, $transformationAlgorithm, $options);
+		$transforms = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'Transforms')->item(0);
+		if (!is_null($transforms)) {
+            $transformedData = self::processTransforms($node, $transforms);
+			
             $digestMethod = $reference->getElementsByTagNameNS(self::NS_XMLDSIG, 'DigestMethod')->item(0);
             if (!is_null($digestMethod)) {
                 $digestAlgorithm = $digestMethod->getAttribute('Algorithm');
