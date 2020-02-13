@@ -784,18 +784,25 @@ class DSig
         if (!is_null($signedInfo)) {
             $canonicalizationMethod = $signedInfo->getElementsByTagNameNS(self::NS_XMLDSIG, 'CanonicalizationMethod')->item(0);
             if (!is_null($canonicalizationMethod)) {
-                $canonicalizationAlgorithm = $canonicalizationMethod->getAttribute('Algorithm');
                 $signatureValue = $signature->getElementsByTagNameNS(self::NS_XMLDSIG, 'SignatureValue')->item(0);
                 if (!is_null($signatureValue)) {
-                    $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm);					
-					$decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
-					try {
-						return $keyForSignature->verifySignature($canonicalizedData, $decodedSignatureValueFromSoapMessage);
-					} catch (InvalidSignatureException $e) {
-						return false;
-					} catch (SignatureErrorException $e) {
-						return false;
-					}
+                    $nsPrefixes = null;
+                    $canonicalizationAlgorithm = $canonicalizationMethod->getAttribute('Algorithm');
+                    $inclusiveNamespaces = $canonicalizationMethod->getElementsByTagNameNS(self::EXC_C14N, 'InclusiveNamespaces')->item(0);
+                    if (!is_null($inclusiveNamespaces)) {
+                        $prefixList = $inclusiveNamespaces->getAttribute('PrefixList');
+                        $nsPrefixes = explode(' ', $prefixList);
+                    }
+
+                    $canonicalizedData = self::canonicalizeData($signedInfo, $canonicalizationAlgorithm, null, $nsPrefixes);
+                    $decodedSignatureValueFromSoapMessage = base64_decode($signatureValue->textContent);
+                    try {
+                        return $keyForSignature->verifySignature($canonicalizedData, $decodedSignatureValueFromSoapMessage);
+                    } catch (InvalidSignatureException $e) {
+                        return false;
+                    } catch (SignatureErrorException $e) {
+                        return false;
+                    }
                 }
             }
         }
